@@ -1,0 +1,61 @@
+﻿@page
+@model APIAccountsModel
+@{
+    ViewData["Title"] = "API Accounts";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>Use this page to detail your site's Host policy.</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                API Name
+            </th>
+            <th>
+                API Key
+            </th>
+            <th>
+                Documentation Link
+            </th>
+            <th>
+                Category
+            </th>
+        </tr>
+    </thead>
+    <tbody id="accountTable">
+       
+    </tbody>
+</table>
+
+<script language="JavaScript" type="text/javascript" src="/lib/jquery/dist/jquery.js"></script>
+<script>
+    var accounts = []
+    $.ajax({
+        method: "GET",
+        url: "https://localhost:7073/api/APIAccounts",
+        "headers": {},
+        success:function(response){
+            accounts = response
+            populateAccountTable(accounts)
+        }            
+    });
+
+    function populateAccountTable(accounts)
+    {
+        var table = document.getElementById("accountTable")
+        for(var i = 0; i<accounts.length; i++)
+        {
+            var row = 
+            `<tr>
+                <td>${accounts[i].apiHostName}</td>
+                <td>${accounts[i].apiKey}</td>
+                <td>${accounts[i].documenationLink}</td>
+                <td>${accounts[i].category}</td>
+            </tr>`
+            table.innerHTML +=row;
+        }
+    }
+
+</script>
