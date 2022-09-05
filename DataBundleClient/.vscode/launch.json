@@ -1,6 +1,7 @@
 {
   "version": "0.2.0",
   "configurations": [
+
     {
       "type": "chrome",
       "request": "launch",
@@ -9,9 +10,9 @@
       "webRoot": "${workspaceFolder}"
     },
     {
-      "type": "edge",
+      "type": "firefox",
       "request": "launch",
-      "name": "localhost (Edge)",
+      "name": "localhost (Firefox)",
       "url": "https://localhost:4200",
       "webRoot": "${workspaceFolder}"
     }

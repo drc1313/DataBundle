@@ -1,0 +1,40 @@
+<h1 id="tableLabel">All Accounts</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+<p *ngIf="!accounts"><em>Loading... Please refresh once the ASP.NET backend has started.</em></p>
+
+<table *ngIf="accounts">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Name</th>
+      <th>Documentaion</th>
+      <th>ApiKey</th>
+      <th>Category</th>
+    </tr>
+  </thead>
+  
+  <tbody>
+    <tr *ngFor="let account of accounts">
+      <td></td>
+      <td>{{ account.apiHostName }}</td>
+      <td><a [attr.href]="account.documenationLink"> {{ account.documenationLink }}</a></td>
+      <td>{{ account.apiKey }}</td>
+      <td>{{ account.category }} </td>      
+      <td><button>Edit</button></td>
+      <td><button (click)="accountDelete(account.accountId)">Delete</button></td>
+    </tr>
+    
+    <td></td>
+    
+    <td><input type="text" id="accountName" [(ngModel)]="accountName"></td>
+    <td><input type="text" id="inputLink" [(ngModel)]="docLink"></td>
+    <td><input type="text" id="inputApikey" [(ngModel)]="apikey"></td>
+    <td><input type="number" id="number" [(ngModel)]="category"></td>
+  
+    <th><button (click)="accountCreate()">Submit</button></th>
+
+  </tbody>
+</table>
+

@@ -7,22 +7,6 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  public accounts?: APIAccounts[];
-
-  constructor(http: HttpClient) {
-    http.get<APIAccounts[]>('/api/APIAccounts').subscribe(result => {
-      this.accounts = result;
-    }, error => console.error(error));
-  }
-
-  title = 'DataBundleClient';
+  title = 'Data Bundle';
 }
 
-interface APIAccounts {
-  
-  accountId: string;
-  apiHostName: string;
-  documenationLink: string;
-  apiKey: string;
-  category: number;
-}
