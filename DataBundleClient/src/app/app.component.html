@@ -1,0 +1,26 @@
+<h1 id="tableLabel">All Accounts</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+<p *ngIf="!accounts"><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationangular">https://aka.ms/jspsintegrationangular</a> for more details.</em></p>
+
+<table *ngIf="accounts">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Documentaion</th>
+      <th>ApiKey</th>
+      <th>Category</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let accounts of accounts">
+      <td>{{ accounts.accountId }}</td>
+      <td>{{ accounts.apiHostName }}</td>
+      <td>{{ accounts.documenationLink }}</td>
+      <td>{{ accounts.apiKey }}</td>
+      <td>{{ accounts.category }}</td>
+    </tr>
+  </tbody>
+</table>
