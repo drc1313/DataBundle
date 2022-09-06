@@ -13,6 +13,9 @@ export class AccountComponent {
   docLink: string = '';
   apikey: string = '';
   category: number = 0;
+
+  editId: string = ""
+  editMode: boolean = false;
   
   status = '';
 
@@ -28,15 +31,24 @@ export class AccountComponent {
     }, error => console.error(error));
   }
 
-  accountUpdate() {
-    const body = { title: 'Angular PUT Request Example' };
-    this.http.put<any>('https://posts/1', body);        
+  async accountUpdate(id: string) {
+    const body = { AccountID: id, ApiHostName: this.accountName, DocumenationLink: this.docLink, ApiKey: this.apikey, Category: this.category };
+    await firstValueFrom(this.http.put<any>('/api/APIAccounts/'+id, body));        
   }
 
   async accountCreate() {
-    const body = { ApiHostName: this.accountName, DocumenationLink: this.docLink, ApiKey: this.apikey, Category: this.category };
-    await firstValueFrom(this.http.post<any>('/api/APIAccounts/', body));
+    if(!this.editMode)
+    {
+      const body = { ApiHostName: this.accountName, DocumenationLink: this.docLink, ApiKey: this.apikey, Category: this.category };
+      await firstValueFrom(this.http.post<any>('/api/APIAccounts/', body));
+    }
+    else
+    {
+      await this.accountUpdate(this.editId);
+      this.editMode = false;
+    }
     this.accountGetAll();
+    this.clearInput();
   }
 
   async accountDelete(id: string){
@@ -44,9 +56,30 @@ export class AccountComponent {
     this.accountGetAll();
   }
 
+  async accountPopulateInput(account: APIAccounts)
+  {
+      this.accountName = account.apiHostName;
+      this.docLink = account.documenationLink;
+      this.apikey = account.apiKey;
+      this.category = account.category;
+      this.editMode = true;
+      this.editId = account.accountId;
+  }
+
+  clearInput()
+  {
+    this.accountName = "";
+    this.docLink = "";
+    this.apikey = "";
+    this.category = 0;
+    this.editId = "";
+
+  }
 
   title = 'DataBundleClient';
 }
+
+
 
 interface APIAccounts {
   
