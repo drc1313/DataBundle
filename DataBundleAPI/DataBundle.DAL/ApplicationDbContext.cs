@@ -12,9 +12,8 @@ namespace DataBundle.DAL
             : base(options)
         {
         }
-        public virtual DbSet<APIAccounts> APIAccounts { get; set; } = null!;
-        public virtual DbSet<SingleAPIRequest> APIRequest { get; set; } = null!;
-        public virtual DbSet<Tokens> Tokens { get; set; } = null!;
+        public virtual DbSet<APIAccount> APIAccount { get; set; } = null!;
+        public virtual DbSet<APIRequest> APIRequest { get; set; } = null!;
      
     }
     public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>

@@ -22,7 +22,7 @@ namespace DataBundle.DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("DataBundle.BL.APIAccounts", b =>
+            modelBuilder.Entity("DataBundle.BL.APIAccount", b =>
                 {
                     b.Property<Guid>("AccountId")
                         .ValueGeneratedOnAdd()
@@ -39,16 +39,24 @@ namespace DataBundle.DAL.Migrations
                     b.Property<int>("Category")
                         .HasColumnType("int");
 
+                    b.Property<string>("DateFormat")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Delimiter")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DocumenationLink")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("AccountId");
 
-                    b.ToTable("APIAccounts");
+                    b.ToTable("APIAccount");
                 });
 
-            modelBuilder.Entity("DataBundle.BL.SingleAPIRequest", b =>
+            modelBuilder.Entity("DataBundle.BL.APIRequest", b =>
                 {
                     b.Property<Guid>("RequestId")
                         .ValueGeneratedOnAdd()
@@ -58,9 +66,11 @@ namespace DataBundle.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("RequestName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RequestURL")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("RequestId");
@@ -70,56 +80,15 @@ namespace DataBundle.DAL.Migrations
                     b.ToTable("APIRequest");
                 });
 
-            modelBuilder.Entity("DataBundle.BL.Tokens", b =>
+            modelBuilder.Entity("DataBundle.BL.APIRequest", b =>
                 {
-                    b.Property<Guid>("TokenId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Categories")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConfigData")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("RequestId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Token")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("TokenId");
-
-                    b.HasIndex("RequestId");
-
-                    b.ToTable("Tokens");
-                });
-
-            modelBuilder.Entity("DataBundle.BL.SingleAPIRequest", b =>
-                {
-                    b.HasOne("DataBundle.BL.APIAccounts", "APIAccounts")
+                    b.HasOne("DataBundle.BL.APIAccount", "APIAccount")
                         .WithMany()
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("APIAccounts");
-                });
-
-            modelBuilder.Entity("DataBundle.BL.Tokens", b =>
-                {
-                    b.HasOne("DataBundle.BL.SingleAPIRequest", "SingleAPIRequest")
-                        .WithMany("Tokens")
-                        .HasForeignKey("RequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SingleAPIRequest");
-                });
-
-            modelBuilder.Entity("DataBundle.BL.SingleAPIRequest", b =>
-                {
-                    b.Navigation("Tokens");
+                    b.Navigation("APIAccount");
                 });
 #pragma warning restore 612, 618
         }

@@ -23,44 +23,45 @@ namespace DataBundleAPI.Controllers
 
         // GET: api/APIAccounts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<APIAccounts>>> GetAPIAccounts()
+        public async Task<ActionResult<IEnumerable<APIAccount>>> GetAPIAccount()
         {
-          if (_context.APIAccounts == null)
+          if (_context.APIAccount == null)
           {
               return NotFound();
           }
-            return await _context.APIAccounts.ToListAsync();
+            return await _context.APIAccount.ToListAsync();
         }
 
         // GET: api/APIAccounts/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<APIAccounts>> GetAPIAccounts(Guid id)
+        public async Task<ActionResult<APIAccount>> GetAPIAccount(Guid id)
         {
-          if (_context.APIAccounts == null)
+          if (_context.APIAccount == null)
           {
               return NotFound();
           }
-            var aPIAccounts = await _context.APIAccounts.FindAsync(id);
+            var aPIAccount = await _context.APIAccount.FindAsync(id);
 
-            if (aPIAccounts == null)
+            if (aPIAccount == null)
             {
                 return NotFound();
             }
 
-            return aPIAccounts;
+            return aPIAccount;
         }
 
         // PUT: api/APIAccounts/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAPIAccounts(Guid id, APIAccounts aPIAccounts)
+        public async Task<IActionResult> PutAPIAccount(Guid id, APIAccount aPIAccount)
         {
-            if (id != aPIAccounts.AccountId)
+            aPIAccount.AccountId = id;
+            if (id != aPIAccount.AccountId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(aPIAccounts).State = EntityState.Modified;
+            _context.Entry(aPIAccount).State = EntityState.Modified;
 
             try
             {
@@ -68,7 +69,7 @@ namespace DataBundleAPI.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!APIAccountsExists(id))
+                if (!APIAccountExists(id))
                 {
                     return NotFound();
                 }
@@ -84,41 +85,41 @@ namespace DataBundleAPI.Controllers
         // POST: api/APIAccounts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<APIAccounts>> PostAPIAccounts(APIAccounts aPIAccounts)
+        public async Task<ActionResult<APIAccount>> PostAPIAccount(APIAccount aPIAccount)
         {
-          if (_context.APIAccounts == null)
+          if (_context.APIAccount == null)
           {
-              return Problem("Entity set 'ApplicationDbContext.APIAccounts'  is null.");
+              return Problem("Entity set 'ApplicationDbContext.APIAccount'  is null.");
           }
-            _context.APIAccounts.Add(aPIAccounts);
+            _context.APIAccount.Add(aPIAccount);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetAPIAccounts", new { id = aPIAccounts.AccountId }, aPIAccounts);
+            return CreatedAtAction("GetAPIAccount", new { id = aPIAccount.AccountId }, aPIAccount);
         }
 
         // DELETE: api/APIAccounts/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAPIAccounts(Guid id)
+        public async Task<IActionResult> DeleteAPIAccount(Guid id)
         {
-            if (_context.APIAccounts == null)
+            if (_context.APIAccount == null)
             {
                 return NotFound();
             }
-            var aPIAccounts = await _context.APIAccounts.FindAsync(id);
-            if (aPIAccounts == null)
+            var aPIAccount = await _context.APIAccount.FindAsync(id);
+            if (aPIAccount == null)
             {
                 return NotFound();
             }
 
-            _context.APIAccounts.Remove(aPIAccounts);
+            _context.APIAccount.Remove(aPIAccount);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool APIAccountsExists(Guid id)
+        private bool APIAccountExists(Guid id)
         {
-            return (_context.APIAccounts?.Any(e => e.AccountId == id)).GetValueOrDefault();
+            return (_context.APIAccount?.Any(e => e.AccountId == id)).GetValueOrDefault();
         }
     }
 }

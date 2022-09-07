@@ -7,6 +7,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AccountComponent } from './accounts/accounts.component';
+import { RequestComponent } from './requests/requests.component';
 
 import { AppComponent } from './app.component';
 
@@ -14,7 +15,8 @@ import { AppComponent } from './app.component';
   declarations: [
     AppComponent,
     DashboardComponent,
-    AccountComponent
+    AccountComponent,
+    RequestComponent
   ],
   imports: [
     BrowserModule, HttpClientModule, AppRoutingModule, FormsModule
