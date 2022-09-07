@@ -1,24 +1,69 @@
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
 import { Component } from '@angular/core';
+import { RequestExtend } from '../request-class/request.extend';
 
 @Component({
   selector: 'app-root',
   templateUrl: './requests.component.html',
   styleUrls: ['./requests.component.css']
 })
-export class RequestComponent {
-  title = 'RequestComponent';
-  
-  public requests?: APIRequest[];
-  constructor(private http: HttpClient) {
+
+
+export class RequestComponent extends RequestExtend{
+ 
+  title = 'DataBundleClient';
+
+  accountId: string = '';
+  requestName: string = '';
+  requestURL: string = '';
+
+  constructor(http: HttpClient,) {
+    super(http, "/api/APIRequests/");
   }
+
+  async submit(body:{})
+  {
+
+    if(!this.editMode)
+    {
+      await this.create(body)
+    }
+    else
+    {
+      await this.update(this.editId, body);
+      this.editMode = false;
+    }
+    this.getAll();
+    this.clearInput();
+  }
+
+  async accountPopulateInput(singleRequest: APIRequest)
+  {
+      this.accountId = singleRequest.accountId;
+      this.requestName = singleRequest.requestName;
+      this.requestURL = singleRequest.requestURL;
+
+      this.editMode = true;
+      this.editId = singleRequest.requestId;
+  }
+
+  clearInput()
+  {
+    this.accountId = "";
+    this.requestName = "";
+    this.requestURL = "";
+  }
+
 }
 
+
+
+
+
 interface APIRequest {
-  requsetId: string;
+  requestId: string;
   accountId: string;
-  tequestName: string;
+  requestName: string;
   requestURL: string;
 }
 

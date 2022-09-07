@@ -55,6 +55,7 @@ namespace DataBundleAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAPIRequest(Guid id, APIRequest aPIRequest)
         {
+            aPIRequest.RequestId = id;
             if (id != aPIRequest.RequestId)
             {
                 return BadRequest();

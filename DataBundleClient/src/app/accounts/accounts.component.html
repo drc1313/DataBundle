@@ -1,10 +1,10 @@
 <h1 id="tableLabel">All Accounts</h1>
 
-<p>This component demonstrates fetching data from the server.</p>
+<p>List of all API Accounts you have registered with</p>
 
-<p *ngIf="!accounts"><em>Loading... Please refresh once the ASP.NET backend has started.</em></p>
+<p *ngIf="!responseElements"><em>Loading...</em></p>
 
-<table *ngIf="accounts">
+<table *ngIf="responseElements">
   <thead>
     <tr>
       <th></th>
@@ -18,7 +18,7 @@
   </thead>
   
   <tbody>
-    <tr *ngFor="let account of accounts">
+    <tr *ngFor="let account of responseElements">
       <td></td>
       <td>{{ account.apiHostName }}</td>
       <td><a [attr.href]="account.documenationLink"> {{ account.documenationLink }}</a></td>
@@ -27,19 +27,18 @@
       <td>{{ account.delimiter }} </td>      
       <td>{{ account.category }} </td>      
       <td><button (click)="accountPopulateInput(account)">Edit</button></td>
-      <td><button (click)="accountDelete(account.accountId)">Delete</button></td>
+      <td><button (click)="delete(account.accountId)">Delete</button></td>
     </tr>
     
-    <td></td>
-    
-    <td><input type="text" id="accountName" [(ngModel)]="accountName " ></td>
-    <td><input type="text" id="inputLink" [(ngModel)]="docLink" ></td>
-    <td><input type="text" id="inputApikey" [(ngModel)]="apikey" ></td>
+    <td></td>    
+    <td><input type="text" id="accountName" [(ngModel)]="apiHostName " ></td>
+    <td><input type="text" id="inputLink" [(ngModel)]="documenationLink" ></td>
+    <td><input type="text" id="inputApikey" [(ngModel)]="apiKey" ></td>
     <td><input type="text" id="dateFormat" [(ngModel)]="dateFormat" ></td>
     <td><input type="text" id="delimiter" [(ngModel)]="delimiter" ></td>
     <td><input type="number" id="number" [(ngModel)]="category" ></td>
   
-    <th><button (click)="accountCreate()">Submit</button></th>
+    <th><button (click)="submit({apiHostName,documenationLink,apiKey,dateFormat,delimiter,category})">Submit</button></th>
 
   </tbody>
 </table>

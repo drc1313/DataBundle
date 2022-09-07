@@ -1,0 +1,39 @@
+<h1 id="tableLabel">All Requests</h1>
+
+<p>List of all Requests you have registered with</p>
+
+<p *ngIf="!responseElements"><em>Loading...</em></p>
+
+<table *ngIf="responseElements">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Account ID</th>
+      <th>Request Name</th>
+      <th>Request URL</th>
+    </tr>
+  </thead>
+  
+  <tbody>
+    <tr *ngFor="let request of responseElements">
+      <td></td>
+      <td>{{ request.accountId }}</td>
+      <td>{{ request.requestName }}</td>
+      <td>{{ request.requestURL }} </td>     
+      
+
+      <td><button (click)="accountPopulateInput(request)">Edit</button></td>
+      <td><button (click)="delete(request.requestId)">Delete</button></td>
+    </tr>
+    
+    <td></td>
+    
+    <td><input type="text" id="accountId" [(ngModel)]="accountId" ></td>
+    <td><input type="text" id="requestName" [(ngModel)]="requestName" ></td>
+    <td><input type="text" id="requestURL" [(ngModel)]="requestURL" ></td>
+  
+    <th><button (click)="submit({accountId,requestName,requestURL})">Submit</button></th>
+
+  </tbody>
+</table>
+

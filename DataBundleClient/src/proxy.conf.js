@@ -1,7 +1,7 @@
 const PROXY_CONFIG = [
   {
     context: [
-      "/api/APIAccounts",
+      "/api"
     ],
     target: "https://localhost:7073",
     secure: false
