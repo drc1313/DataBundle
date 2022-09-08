@@ -12,7 +12,7 @@ export class AccountComponent extends RequestExtend{
  
   title = 'DataBundleClient';
 
-  apiHostName: string = '';
+  accountName: string = '';
   documenationLink: string = '';
   apiKey: string = '';
   dateFormat: string = '';
@@ -41,7 +41,7 @@ export class AccountComponent extends RequestExtend{
 
   async accountPopulateInput(account: APIAccounts)
   {
-      this.apiHostName = account.apiHostName;
+      this.accountName = account.accountName;
       this.documenationLink = account.documenationLink;
       this.apiKey = account.apiKey;
       this.dateFormat = account.dateFormat;
@@ -49,12 +49,12 @@ export class AccountComponent extends RequestExtend{
       this.category = account.category;
 
       this.editMode = true;
-      this.editId = account.accountId;
+      this.editId = account.accountName;
   }
 
   clearInput()
   {
-    this.apiHostName = "";
+    this.accountName = "";
     this.documenationLink = "";
     this.apiKey = "";
     this.category = 0;
@@ -64,8 +64,7 @@ export class AccountComponent extends RequestExtend{
 }
 
 interface APIAccounts {  
-  accountId: string;
-  apiHostName: string;
+  accountName: string;
   documenationLink: string;
   apiKey: string;
   dateFormat: string;

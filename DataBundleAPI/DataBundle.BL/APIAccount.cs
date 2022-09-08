@@ -7,13 +7,9 @@ namespace DataBundle.BL
     public class APIAccount
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [DefaultValue("00000000-0000-0000-0000-000000000000")]
-        public Guid AccountId { get; set; } = Guid.NewGuid();
-
         [Required]
-        [DefaultValue("HostName")]
-        public string ApiHostName { get; set; } = "";
+        [DefaultValue("accountName")]
+        public string AccountName { get; set; } = "";
 
         [DefaultValue("https://example.com")]
         public string DocumenationLink { get; set; } = "";

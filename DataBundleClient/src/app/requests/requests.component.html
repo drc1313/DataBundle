@@ -8,7 +8,7 @@
   <thead>
     <tr>
       <th></th>
-      <th>Account ID</th>
+      <th>Account Name</th>
       <th>Request Name</th>
       <th>Request URL</th>
     </tr>
@@ -17,7 +17,7 @@
   <tbody>
     <tr *ngFor="let request of responseElements">
       <td></td>
-      <td>{{ request.accountId }}</td>
+      <td>{{ request.accountName }}</td>
       <td>{{ request.requestName }}</td>
       <td>{{ request.requestURL }} </td>     
       
@@ -28,11 +28,11 @@
     
     <td></td>
     
-    <td><input type="text" id="accountId" [(ngModel)]="accountId" ></td>
+    <td><input type="text" id="accountId" [(ngModel)]="accountName" ></td>
     <td><input type="text" id="requestName" [(ngModel)]="requestName" ></td>
     <td><input type="text" id="requestURL" [(ngModel)]="requestURL" ></td>
   
-    <th><button (click)="submit({accountId,requestName,requestURL})">Submit</button></th>
+    <th><button (click)="submit({accountName,requestName,requestURL})">Submit</button></th>
 
   </tbody>
 </table>

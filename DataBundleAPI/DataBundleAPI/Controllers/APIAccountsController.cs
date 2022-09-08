@@ -33,14 +33,14 @@ namespace DataBundleAPI.Controllers
         }
 
         // GET: api/APIAccounts/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<APIAccount>> GetAPIAccount(Guid id)
+        [HttpGet("{AccountName}")]
+        public async Task<ActionResult<APIAccount>> GetAPIAccount(string AccountName)
         {
           if (_context.APIAccount == null)
           {
               return NotFound();
           }
-            var aPIAccount = await _context.APIAccount.FindAsync(id);
+            var aPIAccount = await _context.APIAccount.FindAsync(AccountName);
 
             if (aPIAccount == null)
             {
@@ -52,11 +52,10 @@ namespace DataBundleAPI.Controllers
 
         // PUT: api/APIAccounts/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAPIAccount(Guid id, APIAccount aPIAccount)
+        [HttpPut("{AccountName}")]
+        public async Task<IActionResult> PutAPIAccount(string AccountName, APIAccount aPIAccount)
         {
-            aPIAccount.AccountId = id;
-            if (id != aPIAccount.AccountId)
+            if (AccountName != aPIAccount.AccountName)
             {
                 return BadRequest();
             }
@@ -69,7 +68,7 @@ namespace DataBundleAPI.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!APIAccountExists(id))
+                if (!APIAccountExists(AccountName))
                 {
                     return NotFound();
                 }
@@ -92,20 +91,34 @@ namespace DataBundleAPI.Controllers
               return Problem("Entity set 'ApplicationDbContext.APIAccount'  is null.");
           }
             _context.APIAccount.Add(aPIAccount);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (APIAccountExists(aPIAccount.AccountName))
+                {
+                    return Conflict();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
-            return CreatedAtAction("GetAPIAccount", new { id = aPIAccount.AccountId }, aPIAccount);
+            return CreatedAtAction("GetAPIAccount", new { id = aPIAccount.AccountName }, aPIAccount);
         }
 
         // DELETE: api/APIAccounts/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAPIAccount(Guid id)
+        [HttpDelete("{AccountName}")]
+        public async Task<IActionResult> DeleteAPIAccount(string AccountName)
         {
             if (_context.APIAccount == null)
             {
                 return NotFound();
             }
-            var aPIAccount = await _context.APIAccount.FindAsync(id);
+            var aPIAccount = await _context.APIAccount.FindAsync(AccountName);
             if (aPIAccount == null)
             {
                 return NotFound();
@@ -117,9 +130,9 @@ namespace DataBundleAPI.Controllers
             return NoContent();
         }
 
-        private bool APIAccountExists(Guid id)
+        private bool APIAccountExists(string AccountName)
         {
-            return (_context.APIAccount?.Any(e => e.AccountId == id)).GetValueOrDefault();
+            return (_context.APIAccount?.Any(e => e.AccountName == AccountName)).GetValueOrDefault();
         }
     }
 }

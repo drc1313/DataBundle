@@ -15,18 +15,22 @@ export class RequestExtend {
     this.getAll();
   }
 
-  async getAll(): Promise<void> {
-    this.responseElements = await firstValueFrom(this.http.get<any[]>(this.requestPath))
+  async getAll(path = this.requestPath): Promise<any> {
+    this.responseElements = await firstValueFrom(this.http.get<any[]>(path))
+    return this.responseElements;
   }
-  async create(body:{}): Promise<void> {
-    await firstValueFrom(this.http.post<any>(this.requestPath, body));
+  async get(id: string, path = this.requestPath): Promise<any> {
+    return await firstValueFrom( this.http.get<any>(path+id))
   }
-  async update(id: string, body:{}): Promise<void> {
-    await firstValueFrom(this.http.put<any>(this.requestPath+id, body));        
+  async create(body:{}, path = this.requestPath): Promise<void> {
+    await firstValueFrom(this.http.post<any>(path, body));
+  }
+  async update(id: string, body:{}, path = this.requestPath): Promise<void> {
+    await firstValueFrom(this.http.put<any>(path+id, body));        
   }
 
-  async delete(id: string): Promise<void> {
-    await firstValueFrom( this.http.delete<any>(this.requestPath+id))
+  async delete(id: string, path = this.requestPath): Promise<void> {
+    await firstValueFrom( this.http.delete<any>(path+id))
     this.getAll();
   }
 }

@@ -20,25 +20,25 @@
   <tbody>
     <tr *ngFor="let account of responseElements">
       <td></td>
-      <td>{{ account.apiHostName }}</td>
+      <td>{{ account.accountName }}</td>
       <td><a [attr.href]="account.documenationLink"> {{ account.documenationLink }}</a></td>
       <td>{{ account.apiKey }}</td>
       <td>{{ account.dateFormat }} </td>      
       <td>{{ account.delimiter }} </td>      
       <td>{{ account.category }} </td>      
       <td><button (click)="accountPopulateInput(account)">Edit</button></td>
-      <td><button (click)="delete(account.accountId)">Delete</button></td>
+      <td><button (click)="delete(account.accountName)">Delete</button></td>
     </tr>
     
     <td></td>    
-    <td><input type="text" id="accountName" [(ngModel)]="apiHostName " ></td>
+    <td><input type="text" id="accountName" [(ngModel)]="accountName" ></td>
     <td><input type="text" id="inputLink" [(ngModel)]="documenationLink" ></td>
     <td><input type="text" id="inputApikey" [(ngModel)]="apiKey" ></td>
     <td><input type="text" id="dateFormat" [(ngModel)]="dateFormat" ></td>
     <td><input type="text" id="delimiter" [(ngModel)]="delimiter" ></td>
     <td><input type="number" id="number" [(ngModel)]="category" ></td>
   
-    <th><button (click)="submit({apiHostName,documenationLink,apiKey,dateFormat,delimiter,category})">Submit</button></th>
+    <th><button (click)="submit({accountName,documenationLink,apiKey,dateFormat,delimiter,category})">Submit</button></th>
 
   </tbody>
 </table>

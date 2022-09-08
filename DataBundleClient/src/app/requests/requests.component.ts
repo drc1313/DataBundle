@@ -8,12 +8,11 @@ import { RequestExtend } from '../request-class/request.extend';
   styleUrls: ['./requests.component.css']
 })
 
-
 export class RequestComponent extends RequestExtend{
  
   title = 'DataBundleClient';
 
-  accountId: string = '';
+  accountName: string = '';
   requestName: string = '';
   requestURL: string = '';
 
@@ -37,9 +36,15 @@ export class RequestComponent extends RequestExtend{
     this.clearInput();
   }
 
+  async getAccount(AccountName:string)
+  {
+    var response = await this.get(AccountName, "/api/APIAccounts/");
+    console.log(response)
+  }
+
   async accountPopulateInput(singleRequest: APIRequest)
   {
-      this.accountId = singleRequest.accountId;
+      this.accountName = singleRequest.accountName;
       this.requestName = singleRequest.requestName;
       this.requestURL = singleRequest.requestURL;
 
@@ -49,7 +54,7 @@ export class RequestComponent extends RequestExtend{
 
   clearInput()
   {
-    this.accountId = "";
+    this.accountName = "";
     this.requestName = "";
     this.requestURL = "";
   }
@@ -62,7 +67,7 @@ export class RequestComponent extends RequestExtend{
 
 interface APIRequest {
   requestId: string;
-  accountId: string;
+  accountName: string;
   requestName: string;
   requestURL: string;
 }

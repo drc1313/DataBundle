@@ -12,10 +12,11 @@ namespace DataBundle.BL
         [DefaultValue("00000000-0000-0000-0000-000000000000")]
         public Guid RequestId { get; set; } = Guid.NewGuid();
 
-        [DefaultValue("00000000-0000-0000-0000-000000000000")]
-        public Guid AccountId { get; set; }
+        [Required]
+        [DefaultValue("accountName")]
+        public string AccountName { get; set; } = "";
         [JsonIgnore]
-        [ForeignKey("AccountId")]
+        [ForeignKey("AccountName")]
         public APIAccount? APIAccount { get; set; }
 
         [DefaultValue("requestName")]

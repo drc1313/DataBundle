@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DataBundle.DAL.Migrations
 {
-    public partial class init : Migration
+    public partial class reinit : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,8 +13,7 @@ namespace DataBundle.DAL.Migrations
                 name: "APIAccount",
                 columns: table => new
                 {
-                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ApiHostName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ApiHostName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DocumenationLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ApiKey = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateFormat = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -23,7 +22,7 @@ namespace DataBundle.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_APIAccount", x => x.AccountId);
+                    table.PrimaryKey("PK_APIAccount", x => x.ApiHostName);
                 });
 
             migrationBuilder.CreateTable(
@@ -31,7 +30,7 @@ namespace DataBundle.DAL.Migrations
                 columns: table => new
                 {
                     RequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ApiHostName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     RequestName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RequestURL = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -39,17 +38,17 @@ namespace DataBundle.DAL.Migrations
                 {
                     table.PrimaryKey("PK_APIRequest", x => x.RequestId);
                     table.ForeignKey(
-                        name: "FK_APIRequest_APIAccount_AccountId",
-                        column: x => x.AccountId,
+                        name: "FK_APIRequest_APIAccount_ApiHostName",
+                        column: x => x.ApiHostName,
                         principalTable: "APIAccount",
-                        principalColumn: "AccountId",
+                        principalColumn: "ApiHostName",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_APIRequest_AccountId",
+                name: "IX_APIRequest_ApiHostName",
                 table: "APIRequest",
-                column: "AccountId");
+                column: "ApiHostName");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

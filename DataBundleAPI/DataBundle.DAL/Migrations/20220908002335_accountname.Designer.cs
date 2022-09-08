@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataBundle.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220907001323_init")]
-    partial class init
+    [Migration("20220908002335_accountname")]
+    partial class accountname
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,13 +26,8 @@ namespace DataBundle.DAL.Migrations
 
             modelBuilder.Entity("DataBundle.BL.APIAccount", b =>
                 {
-                    b.Property<Guid>("AccountId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ApiHostName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("AccountName")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ApiKey")
                         .IsRequired()
@@ -53,7 +48,7 @@ namespace DataBundle.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("AccountId");
+                    b.HasKey("AccountName");
 
                     b.ToTable("APIAccount");
                 });
@@ -64,8 +59,9 @@ namespace DataBundle.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AccountId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RequestName")
                         .IsRequired()
@@ -77,7 +73,7 @@ namespace DataBundle.DAL.Migrations
 
                     b.HasKey("RequestId");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("AccountName");
 
                     b.ToTable("APIRequest");
                 });
@@ -86,7 +82,7 @@ namespace DataBundle.DAL.Migrations
                 {
                     b.HasOne("DataBundle.BL.APIAccount", "APIAccount")
                         .WithMany()
-                        .HasForeignKey("AccountId")
+                        .HasForeignKey("AccountName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
