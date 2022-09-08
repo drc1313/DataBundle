@@ -22,10 +22,10 @@ export class RequestExtend {
   async get(id: string, path = this.requestPath): Promise<any> {
     return await firstValueFrom( this.http.get<any>(path+id))
   }
-  async create(body:{}, path = this.requestPath): Promise<void> {
+  async create(body:any, path = this.requestPath): Promise<void> {
     await firstValueFrom(this.http.post<any>(path, body));
   }
-  async update(id: string, body:{}, path = this.requestPath): Promise<void> {
+  async update(id: string, body:any, path = this.requestPath): Promise<void> {
     await firstValueFrom(this.http.put<any>(path+id, body));        
   }
 

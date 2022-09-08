@@ -19,20 +19,19 @@
       <td></td>
       <td>{{ request.accountName }}</td>
       <td>{{ request.requestName }}</td>
-      <td>{{ request.requestURL }} </td>     
-      
+      <td>{{ request.requestURL }} </td>           
 
       <td><button (click)="accountPopulateInput(request)">Edit</button></td>
       <td><button (click)="delete(request.requestId)">Delete</button></td>
+      <td><button (click)="testRequest(request)">Test Request</button></td>
     </tr>
     
-    <td></td>
-    
-    <td><input type="text" id="accountId" [(ngModel)]="accountName" ></td>
-    <td><input type="text" id="requestName" [(ngModel)]="requestName" ></td>
-    <td><input type="text" id="requestURL" [(ngModel)]="requestURL" ></td>
+    <td></td>    
+    <td><input type="text" id="accountId" [(ngModel)]="this.instance.accountName" ></td>
+    <td><input type="text" id="requestName" [(ngModel)]="this.instance.requestName" ></td>
+    <td><input type="text" id="requestURL" [(ngModel)]="this.instance.requestURL" ></td>
   
-    <th><button (click)="submit({accountName,requestName,requestURL})">Submit</button></th>
+    <th><button (click)="submit(this.instance)">Submit</button></th>
 
   </tbody>
 </table>

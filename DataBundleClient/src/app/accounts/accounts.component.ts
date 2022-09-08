@@ -11,19 +11,15 @@ import { RequestExtend } from '../request-class/request.extend';
 export class AccountComponent extends RequestExtend{
  
   title = 'DataBundleClient';
-
-  accountName: string = '';
-  documenationLink: string = '';
-  apiKey: string = '';
-  dateFormat: string = '';
-  delimiter: string = '';
-  category: number = 0;
+  
+  instance:APIAccounts;
 
   constructor(http: HttpClient,) {
     super(http, "/api/APIAccounts/");
+    this.instance = new APIAccounts();
   }
 
-  async submit(body:{})
+  async submit(body:APIAccounts)
   {
 
     if(!this.editMode)
@@ -41,12 +37,12 @@ export class AccountComponent extends RequestExtend{
 
   async accountPopulateInput(account: APIAccounts)
   {
-      this.accountName = account.accountName;
-      this.documenationLink = account.documenationLink;
-      this.apiKey = account.apiKey;
-      this.dateFormat = account.dateFormat;
-      this.delimiter = account.delimiter;
-      this.category = account.category;
+      this.instance.accountName = account.accountName;
+      this.instance.documenationLink = account.documenationLink;
+      this.instance.apiKey = account.apiKey;
+      this.instance.dateFormat = account.dateFormat;
+      this.instance.delimiter = account.delimiter;
+      this.instance.category = account.category;
 
       this.editMode = true;
       this.editId = account.accountName;
@@ -54,21 +50,20 @@ export class AccountComponent extends RequestExtend{
 
   clearInput()
   {
-    this.accountName = "";
-    this.documenationLink = "";
-    this.apiKey = "";
-    this.category = 0;
-    this.editId = "";
+    this.instance.accountName = "";
+    this.instance.documenationLink = "";
+    this.instance.apiKey = "";
+    this.instance.category = 0;
   }
 
 }
 
-interface APIAccounts {  
-  accountName: string;
-  documenationLink: string;
-  apiKey: string;
-  dateFormat: string;
-  delimiter: string;
-  category: number;
+class APIAccounts {  
+  accountName: string="";
+  documenationLink: string="";
+  apiKey: string="";
+  dateFormat: string="";
+  delimiter: string="";
+  category: number=0;
 }
 

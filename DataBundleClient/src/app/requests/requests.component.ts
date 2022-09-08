@@ -12,15 +12,14 @@ export class RequestComponent extends RequestExtend{
  
   title = 'DataBundleClient';
 
-  accountName: string = '';
-  requestName: string = '';
-  requestURL: string = '';
+  instance:APIRequest;
 
   constructor(http: HttpClient,) {
     super(http, "/api/APIRequests/");
+    this.instance = new APIRequest();
   }
 
-  async submit(body:{})
+  async submit(body:APIRequest)
   {
 
     if(!this.editMode)
@@ -42,11 +41,17 @@ export class RequestComponent extends RequestExtend{
     console.log(response)
   }
 
+  testRequest(request:APIRequest)
+  {
+    console.log(request.requestURL);
+
+  }
+
   async accountPopulateInput(singleRequest: APIRequest)
   {
-      this.accountName = singleRequest.accountName;
-      this.requestName = singleRequest.requestName;
-      this.requestURL = singleRequest.requestURL;
+      this.instance.accountName = singleRequest.accountName;
+      this.instance.requestName = singleRequest.requestName;
+      this.instance.requestURL = singleRequest.requestURL;
 
       this.editMode = true;
       this.editId = singleRequest.requestId;
@@ -54,21 +59,16 @@ export class RequestComponent extends RequestExtend{
 
   clearInput()
   {
-    this.accountName = "";
-    this.requestName = "";
-    this.requestURL = "";
+    this.instance.accountName = "";
+    this.instance.requestName = "";
+    this.instance.requestURL = "";
   }
-
 }
 
-
-
-
-
-interface APIRequest {
-  requestId: string;
-  accountName: string;
-  requestName: string;
-  requestURL: string;
+class APIRequest {
+  requestId: string ="00000000-0000-0000-0000-000000000000";
+  accountName: string="";
+  requestName: string="";;
+  requestURL: string="";;
 }
 

@@ -31,14 +31,14 @@
     </tr>
     
     <td></td>    
-    <td><input type="text" id="accountName" [(ngModel)]="accountName" ></td>
-    <td><input type="text" id="inputLink" [(ngModel)]="documenationLink" ></td>
-    <td><input type="text" id="inputApikey" [(ngModel)]="apiKey" ></td>
-    <td><input type="text" id="dateFormat" [(ngModel)]="dateFormat" ></td>
-    <td><input type="text" id="delimiter" [(ngModel)]="delimiter" ></td>
-    <td><input type="number" id="number" [(ngModel)]="category" ></td>
+    <td><input type="text" id="accountName" [(ngModel)]="this.instance.accountName" ></td>
+    <td><input type="text" id="inputLink" [(ngModel)]="this.instance.documenationLink" ></td>
+    <td><input type="text" id="inputApikey" [(ngModel)]="this.instance.apiKey" ></td>
+    <td><input type="text" id="dateFormat" [(ngModel)]="this.instance.dateFormat" ></td>
+    <td><input type="text" id="delimiter" [(ngModel)]="this.instance.delimiter" ></td>
+    <td><input type="number" id="number" [(ngModel)]="this.instance.category" ></td>
   
-    <th><button (click)="submit({accountName,documenationLink,apiKey,dateFormat,delimiter,category})">Submit</button></th>
+    <th><button (click)="submit(this.instance)">Submit</button></th>
 
   </tbody>
 </table>
