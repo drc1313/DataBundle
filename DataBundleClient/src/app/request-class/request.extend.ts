@@ -10,7 +10,7 @@ export class RequestExtend {
   
   public responseElements?: any[];
 
-  constructor(private http: HttpClient, requestPath:string) {
+  constructor(public http: HttpClient, requestPath:string) {
     this.requestPath = requestPath;
     this.getAll();
   }
@@ -20,7 +20,7 @@ export class RequestExtend {
     return this.responseElements;
   }
   async get(id: string, path = this.requestPath): Promise<any> {
-    return await firstValueFrom( this.http.get<any>(path+id))
+    return await firstValueFrom(this.http.get<any>(path+id))
   }
   async create(body:any, path = this.requestPath): Promise<void> {
     await firstValueFrom(this.http.post<any>(path, body));

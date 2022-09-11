@@ -21,18 +21,33 @@
       <td>{{ request.requestName }}</td>
       <td>{{ request.requestURL }} </td>           
 
-      <td><button (click)="accountPopulateInput(request)">Edit</button></td>
+      <td><button (click)="requestPopulateInput(request)">Edit</button></td>
       <td><button (click)="delete(request.requestId)">Delete</button></td>
       <td><button (click)="testRequest(request)">Test Request</button></td>
     </tr>
     
     <td></td>    
-    <td><input type="text" id="accountId" [(ngModel)]="this.instance.accountName" ></td>
-    <td><input type="text" id="requestName" [(ngModel)]="this.instance.requestName" ></td>
-    <td><input type="text" id="requestURL" [(ngModel)]="this.instance.requestURL" ></td>
-  
-    <th><button (click)="submit(this.instance)">Submit</button></th>
-
+    <td><input type="text" id="accountId" [(ngModel)]="this.inputInstance.accountName" ></td>
+    <td><input type="text" id="requestName" [(ngModel)]="this.inputInstance.requestName" ></td>
+    <td><input type="text" id="requestURL" [(ngModel)]="this.inputInstance.requestURL" ></td>
+    <th><button (click)="submit(this.inputInstance)">Submit</button></th>
   </tbody>
 </table>
+
+<form [formGroup]="productForm" (ngSubmit)="requestSubmit()">
+  <table class="table table-bordered" formArrayName="tokens">
+    <tr>
+      <th colspan="2">Test Request:</th>
+    </tr>
+    <tr *ngFor="let quantity of tokens().controls; let i=index" [formGroupName]="i">
+      <td>
+        <!-- This line gets the token name from the object ex. SYMBOL DATE APIKEY (Could be imporoved) -->
+        {{(this.tokens().at(i).value.tokenName)}}
+          <input type="text" formControlName="token" class="form-control">
+      </td>
+    </tr>
+  </table>
+  <button type="submit" class="btn btn-success">Submit</button>
+</form>
+
 
