@@ -17,6 +17,9 @@ namespace DataBundle.BL
         [Required]
         [DefaultValue("XYZ")]
         public string ApiKey { get; set; } = "";
+        
+        [DefaultValue("")]
+        public string Headers { get; set; } = "";
 
         [DefaultValue("YYYY-MM-DD")]
         public string DateFormat { get; set; } = "YYYY-MM-DD";

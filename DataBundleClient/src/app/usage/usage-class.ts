@@ -18,6 +18,8 @@ export class Usage {
   
   async getAccountUsage(accountName:string)
   {
+   await this.getAllUsages();
+
     if(this.allUsages != null){
       for(var usage of this.allUsages){
         if(usage.accountName == accountName){

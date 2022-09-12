@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { RequestExtend } from '../request-class/request.extend';
 import { FormGroup, FormArray, FormBuilder} from '@angular/forms'
@@ -88,14 +88,32 @@ export class RequestComponent extends RequestExtend{
 
     //Verify the usage is not maxed out
     if(usage.currentUsage < usage.maxUsage)
-    {
-        this.http.get<any>(submitURL,{observe: 'response'}).subscribe((res)=>{
-          //If we do not find the expected property then the request failed.
-          if(res.body[this.requestInstance.expectedProperty]){
-            requestSuccess = true;
-            this.usageInstance.incrementAccountUsage(usage);
-          }
-        })
+    {      
+      //Check for any headers configured with the account and apply them to the request
+      var headers= new HttpHeaders() 
+      
+      var headerStr = this.currentAccount.headers
+      
+      if(headerStr.length > 0){
+
+        headerStr = headerStr.replace("{APIKEY}", this.currentAccount.apiKey)
+        
+        var headersList = headerStr.split(",")
+        
+        for(var header of headersList)
+        {
+          var splitHeader = header.split(":")
+          headers = headers.append(splitHeader[0], splitHeader[1])
+        }
+      }
+      //Send the request
+      this.http.get<any>(submitURL,{headers:headers, observe: 'response'}).subscribe((res)=>{
+        //If we do not find the expected property then the request failed.        
+        if(res.body[this.requestInstance.expectedProperty]){
+          requestSuccess = true;
+          this.usageInstance.incrementAccountUsage(usage);
+        }
+      })
     }
     else
     {
