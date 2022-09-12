@@ -30,7 +30,7 @@ export class RequestExtend {
   }
 
   async delete(id: string, path = this.requestPath): Promise<void> {
-    await firstValueFrom( this.http.delete<any>(path+id))
+   // await firstValueFrom( this.http.delete<any>(path+id))
     this.getAll();
   }
 }

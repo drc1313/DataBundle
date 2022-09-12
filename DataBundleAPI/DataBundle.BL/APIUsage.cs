@@ -5,12 +5,12 @@ using System.Text.Json.Serialization;
 
 namespace DataBundle.BL
 {
-    public class APIRequest
+    public class APIUsage
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [DefaultValue("00000000-0000-0000-0000-000000000000")]
-        public Guid RequestId { get; set; } = Guid.NewGuid();
+        public Guid UsageID { get; set; } = Guid.NewGuid();
 
         [Required]
         [DefaultValue("accountName")]
@@ -19,15 +19,25 @@ namespace DataBundle.BL
         [ForeignKey("AccountName")]
         public APIAccount? APIAccount { get; set; }
 
-        [DefaultValue("requestName")]
-        public string RequestName { get; set; } = "";
+        [DefaultValue(0)]
+        public int CurrentUsage { get; set; }
 
-        [DefaultValue("https://example/api/request")]
-        public string RequestURL { get; set; } = "";
+        [Required]
+        [DefaultValue(0)]
+        public int MaxUsage { get; set; }
         
-        [DefaultValue("expectedProperty")]
-        public string ExpectedProperty { get; set; } = "";
+        [Required]
+        public UsageDuration UsageDuration { get; set; }
 
-
+        public DateTime LastCallDate { get; set; } = DateTime.Now;
     }
+
+    public enum UsageDuration
+    {
+        NoLimit,
+        Daliy,
+        Monthly,
+        Yearly
+    }
+
 }

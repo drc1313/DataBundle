@@ -58,7 +58,7 @@ export class AccountComponent extends RequestExtend{
 
 }
 
-class APIAccounts {  
+export class APIAccounts {  
   accountName: string="";
   documenationLink: string="";
   apiKey: string="";
