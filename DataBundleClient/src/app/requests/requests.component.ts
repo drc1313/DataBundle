@@ -18,7 +18,7 @@ export class RequestComponent extends RequestExtend{
   inputInstance:APIRequest;
   requestInstance:APIRequest;
   currentAccount:APIAccounts;
-  usageInstance = new Usage(this.http);
+  usageInstance = Usage.getInstance();
   
   constructor(private fb:FormBuilder, http: HttpClient) {
     super(http, "/api/APIRequests/");
@@ -55,6 +55,7 @@ export class RequestComponent extends RequestExtend{
 
   createInputsFromTokens(){
     this.clearTokens();
+
       var split = this.requestInstance.requestURL.split("{")
       for (var elm of split)
       {
@@ -73,14 +74,38 @@ export class RequestComponent extends RequestExtend{
           this.tokens().push(this.newToken(tokenName, tokenValue));
         }        
       }
+
+      if(this.requestInstance.requestBody.length > 0){
+        var split = this.requestInstance.requestBody.split("{")
+        for (var elm of split)
+        {
+          var tokenName = elm.substring(0,elm.indexOf("}"))
+          if (tokenName.length>0)
+          {
+            var tokenValue = ""
+            if(tokenName.includes("APIKEY"))
+            {
+              tokenValue = this.currentAccount.apiKey
+            }
+            else if(tokenName.includes("DATE"))
+            {
+              tokenValue = this.currentAccount.dateFormat
+            }
+            this.tokens().push(this.newToken(tokenName, tokenValue));
+          }        
+        }
+      }
   }
+
 
   async requestSubmit(){
     var requestSuccess = false;
     var submitURL = this.requestInstance.requestURL;
+    var submitBody = this.requestInstance.requestBody;
     for(var token of this.productForm.value.tokens)
     {
       submitURL = submitURL.replace("{"+token.tokenName+"}",token.token)
+      submitBody = submitBody.replace("{"+token.tokenName+"}",token.token)
     }
 
     var usage: APIUsage;
@@ -106,24 +131,44 @@ export class RequestComponent extends RequestExtend{
           headers = headers.append(splitHeader[0], splitHeader[1])
         }
       }
-      //Send the request
-      this.http.get<any>(submitURL,{headers:headers, observe: 'response'}).subscribe((res)=>{
-        //If we do not find the expected property then the request failed.        
-        if(res.body[this.requestInstance.expectedProperty]){
-          requestSuccess = true;
-          this.usageInstance.incrementAccountUsage(usage);
-        }
-      })
+      
+      if(this.requestInstance.requestType == RequestType.GET)
+      {
+        //Send the request
+        this.http.get<any>(submitURL,{headers:headers, observe: 'response'}).subscribe((res)=>{
+          //If we do not find the expected property then the request failed.        
+          if(res.body[this.requestInstance.expectedProperty]){
+            requestSuccess = true;
+            this.usageInstance.incrementAccountUsage(usage);
+          }
+        })
+      }
+      else if(this.requestInstance.requestType == RequestType.POST){
+        
+        
+        var symb = new test();
+        //Send the request
+        this.http.post<any>(submitURL,symb,{headers:headers, observe: 'response'}).subscribe((res)=>{
+          //If we do not find the expected property then the request failed.        
+          if(res.body[this.requestInstance.expectedProperty]){
+            requestSuccess = true;
+            this.usageInstance.incrementAccountUsage(usage);
+          }
+        })
+      }
+      else
+      {
+        console.log("You have exceened your quota for " + this.currentAccount.accountName)
+      }
     }
-    else
-    {
-      console.log("You have exceened your quota for " + this.currentAccount.accountName)
-    }
+    
     
     if(!requestSuccess){
       console.log("The Request has failed")
     }
   }
+
+
   
   //Functions for request creation/editing 
   async submit(body:APIRequest){
@@ -144,6 +189,8 @@ export class RequestComponent extends RequestExtend{
       this.inputInstance.accountName = singleRequest.accountName;
       this.inputInstance.requestName = singleRequest.requestName;
       this.inputInstance.requestURL = singleRequest.requestURL;
+      this.inputInstance.requestType = singleRequest.requestType;
+      this.inputInstance.requestBody = singleRequest.requestBody;
       this.inputInstance.expectedProperty = singleRequest.expectedProperty;
 
       this.editMode = true;
@@ -154,6 +201,8 @@ export class RequestComponent extends RequestExtend{
     this.inputInstance.accountName = "";
     this.inputInstance.requestName = "";
     this.inputInstance.requestURL = "";
+    this.inputInstance.requestBody = "";
+    this.inputInstance.requestType = RequestType.GET;
     this.inputInstance.expectedProperty = "";
   }
 }
@@ -163,6 +212,18 @@ class APIRequest {
   accountName: string="";
   requestName: string="";
   requestURL: string="";
+  requestBody: string="";
+  requestType: RequestType=RequestType.GET;
   expectedProperty: string="";
 }
-
+class test
+{
+  symbol="MSFT"
+}
+enum RequestType
+{
+  GET,
+  POST,
+  PUT,
+  DELETE    
+}

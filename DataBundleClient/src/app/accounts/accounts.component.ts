@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { RequestExtend } from '../request-class/request.extend';
+import {Usage, APIUsage} from '../usage/usage-class'
 
 @Component({
   selector: 'app-root',
@@ -13,6 +14,7 @@ export class AccountComponent extends RequestExtend{
   title = 'DataBundleClient';
   
   instance:APIAccounts;
+  usageInstance = Usage.getInstance();
 
   constructor(http: HttpClient,) {
     super(http, "/api/APIAccounts/");
@@ -25,6 +27,7 @@ export class AccountComponent extends RequestExtend{
     if(!this.editMode)
     {
       await this.create(body)
+      await this.usageInstance.createUsageForAccount(body.accountName)
     }
     else
     {
