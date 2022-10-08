@@ -25,10 +25,6 @@ namespace DataBundleAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<APIRequest>>> GetAPIRequest()
         {
-          if (_context.APIRequest == null)
-          {
-              return NotFound();
-          }
             return await _context.APIRequest.ToListAsync();
         }
 
@@ -36,10 +32,6 @@ namespace DataBundleAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<APIRequest>> GetAPIRequest(Guid id)
         {
-          if (_context.APIRequest == null)
-          {
-              return NotFound();
-          }
             var aPIRequest = await _context.APIRequest.FindAsync(id);
 
             if (aPIRequest == null)
@@ -87,10 +79,6 @@ namespace DataBundleAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<APIRequest>> PostAPIRequest(APIRequest aPIRequest)
         {
-          if (_context.APIRequest == null)
-          {
-              return Problem("Entity set 'ApplicationDbContext.APIRequest'  is null.");
-          }
             _context.APIRequest.Add(aPIRequest);
             await _context.SaveChangesAsync();
 
@@ -101,10 +89,6 @@ namespace DataBundleAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAPIRequest(Guid id)
         {
-            if (_context.APIRequest == null)
-            {
-                return NotFound();
-            }
             var aPIRequest = await _context.APIRequest.FindAsync(id);
             if (aPIRequest == null)
             {
@@ -119,7 +103,7 @@ namespace DataBundleAPI.Controllers
 
         private bool APIRequestExists(Guid id)
         {
-            return (_context.APIRequest?.Any(e => e.RequestId == id)).GetValueOrDefault();
+            return _context.APIRequest.Any(e => e.RequestId == id);
         }
     }
 }

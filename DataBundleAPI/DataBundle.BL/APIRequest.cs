@@ -17,7 +17,7 @@ namespace DataBundle.BL
         public string AccountName { get; set; } = "";
         [JsonIgnore]
         [ForeignKey("AccountName")]
-        public APIAccount APIAccount { get; set; }
+        public APIAccount? APIAccount { get; set; }
 
         [DefaultValue("requestName")]
         public string RequestName { get; set; } = "";

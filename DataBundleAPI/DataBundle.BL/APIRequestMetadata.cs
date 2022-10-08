@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace DataBundle.BL
 {
@@ -8,14 +9,15 @@ namespace DataBundle.BL
     {
 
         [Key]
+        [JsonIgnore]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required]
-        public string RequestId { get; set; }
+        public Guid RequestId { get; set; }
         [JsonIgnore]
         [ForeignKey("RequestId")]
-        public RequestId RequestId { get; set; }
+        public APIRequest? APIRequest { get; set; }
         
         [Required]
         public string Key { get; set; }
