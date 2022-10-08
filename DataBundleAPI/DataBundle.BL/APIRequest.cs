@@ -17,7 +17,7 @@ namespace DataBundle.BL
         public string AccountName { get; set; } = "";
         [JsonIgnore]
         [ForeignKey("AccountName")]
-        public APIAccount? APIAccount { get; set; }
+        public APIAccount APIAccount { get; set; }
 
         [DefaultValue("requestName")]
         public string RequestName { get; set; } = "";
@@ -25,21 +25,5 @@ namespace DataBundle.BL
         [DefaultValue("https://example/api/request")]
         public string RequestURL { get; set; } = "";
 
-        [DefaultValue("")]
-        public string RequestBody { get; set; } = "";
-
-        [Required]
-        [DefaultValue(RequestType.GET)]
-        public RequestType RequestType { get; set; } = RequestType.GET;
-
-        [DefaultValue("expectedProperty")]
-        public string ExpectedProperty { get; set; } = "";
-    }
-    public enum RequestType 
-    {
-        GET,
-        POST,
-        PUT,
-        DELETE        
     }
 }

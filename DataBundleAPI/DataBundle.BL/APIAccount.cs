@@ -16,22 +16,12 @@ namespace DataBundle.BL
         
         [Required]
         [DefaultValue("XYZ")]
-        public string ApiKey { get; set; } = "";
-        
-        [DefaultValue("")]
-        public string Headers { get; set; } = "";
+        public string ApiKey { get; set; } = "";        
 
         [DefaultValue("YYYY-MM-DD")]
         public string DateFormat { get; set; } = "YYYY-MM-DD";
 
         [DefaultValue(",")]
         public string Delimiter { get; set; } = "";
-
-        public APICategory Category { get; set; }
-    }
-    public enum APICategory
-    {
-        Stocks,
-        Economy
     }
 }
