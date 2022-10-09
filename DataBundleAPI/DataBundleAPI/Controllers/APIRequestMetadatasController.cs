@@ -85,6 +85,14 @@ namespace DataBundleAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<APIRequestMetadata>> PostAPIRequestMetadata(APIRequestMetadata aPIRequestMetadata)
         {
+
+            var requestMetadataObject = await _context.APIRequestMetadata.Where(x => x.RequestId == aPIRequestMetadata.RequestId & x.Key == aPIRequestMetadata.Key).FirstOrDefaultAsync();
+
+            if (requestMetadataObject != null) 
+            {
+                return BadRequest();
+            }
+
             _context.APIRequestMetadata.Add(aPIRequestMetadata);
             await _context.SaveChangesAsync();
 
