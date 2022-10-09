@@ -37,7 +37,7 @@
 
 <form *ngIf = "editMode" [formGroup]="metadataForm" (ngSubmit)="requstMetadataSubmit()">
   <select formControlName="metadataName">
-    <option *ngFor="let metadata of requestMetadata"
+    <option *ngFor="let metadata of requestMetadataValues"
             [value]="metadata">
       {{RequestMetadataMapping[metadata]}}
     </option>
