@@ -11,10 +11,8 @@
       <th>Name</th>
       <th>Documentaion</th>
       <th>ApiKey</th>
-      <th>headers</th>
       <th>Date Format</th>
       <th>Delmiter</th>      
-      <th>Category</th>
     </tr>
   </thead>
   
@@ -24,10 +22,8 @@
       <td>{{ account.accountName }}</td>
       <td><a [attr.href]="account.documenationLink"> {{ account.documenationLink }}</a></td>
       <td>{{ account.apiKey }}</td>
-      <td>{{ account.headers }}</td>
       <td>{{ account.dateFormat }} </td>      
       <td>{{ account.delimiter }} </td>      
-      <td>{{ account.category }} </td>      
       <td><button (click)="accountPopulateInput(account)">Edit</button></td>
       <td><button (click)="delete(account.accountName)">Delete</button></td>
     </tr>
@@ -36,10 +32,8 @@
     <td><input type="text" id="accountName" [(ngModel)]="this.instance.accountName" ></td>
     <td><input type="text" id="inputLink" [(ngModel)]="this.instance.documenationLink" ></td>
     <td><input type="text" id="inputApikey" [(ngModel)]="this.instance.apiKey" ></td>
-    <td><input type="text" id="inputheaders" [(ngModel)]="this.instance.headers" ></td>
     <td><input type="text" id="dateFormat" [(ngModel)]="this.instance.dateFormat" ></td>
     <td><input type="text" id="delimiter" [(ngModel)]="this.instance.delimiter" ></td>
-    <td><input type="number" id="number" [(ngModel)]="this.instance.category" ></td>
   
     <th><button (click)="submit(this.instance)">Submit</button></th>
 

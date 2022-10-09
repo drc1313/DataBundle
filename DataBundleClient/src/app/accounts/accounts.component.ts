@@ -43,10 +43,8 @@ export class AccountComponent extends RequestExtend{
       this.instance.accountName = account.accountName;
       this.instance.documenationLink = account.documenationLink;
       this.instance.apiKey = account.apiKey;
-      this.instance.headers = account.headers;
       this.instance.dateFormat = account.dateFormat;
       this.instance.delimiter = account.delimiter;
-      this.instance.category = account.category;
 
       this.editMode = true;
       this.editId = account.accountName;
@@ -57,8 +55,6 @@ export class AccountComponent extends RequestExtend{
     this.instance.accountName = "";
     this.instance.documenationLink = "";
     this.instance.apiKey = "";
-    this.instance.headers = "";
-    this.instance.category = 0;
   }
 
 }
@@ -67,9 +63,7 @@ export class APIAccounts {
   accountName: string="";
   documenationLink: string="";
   apiKey: string="";
-  headers: string="";
   dateFormat: string="";
   delimiter: string="";
-  category: number=0;
 }
 

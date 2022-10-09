@@ -11,9 +11,6 @@
       <th>Account Name</th>
       <th>Request Name</th>
       <th>Request URL</th>
-      <th>Request Body</th>
-      <th>Request Type</th>
-      <th>Expected Property</th>
     </tr>
   </thead>
   
@@ -23,9 +20,6 @@
       <td>{{ request.accountName }}</td>
       <td>{{ request.requestName }}</td>
       <td>{{ request.requestURL }} </td>           
-      <td>{{ request.requestBody }} </td>           
-      <td>{{ request.requestType }} </td>           
-      <td>{{ request.expectedProperty }} </td>           
 
       <td><button (click)="requestPopulateInput(request)">Edit</button></td>
       <td><button (click)="delete(request.requestId)">Delete</button></td>
@@ -36,12 +30,22 @@
     <td><input type="text" id="accountId" [(ngModel)]="this.inputInstance.accountName" ></td>
     <td><input type="text" id="requestName" [(ngModel)]="this.inputInstance.requestName" ></td>
     <td><input type="text" id="requestURL" [(ngModel)]="this.inputInstance.requestURL" ></td>
-    <td><input type="text" id="requestBody" [(ngModel)]="this.inputInstance.requestBody" ></td>
-    <td><input type="number" id="requestType" [(ngModel)]="this.inputInstance.requestType" ></td>
-    <td><input type="text" id="expectedProperty" [(ngModel)]="this.inputInstance.expectedProperty" ></td>
     <th><button (click)="submit(this.inputInstance)">Submit</button></th>
   </tbody>
 </table>
+<br>
+
+<form *ngIf = "editMode" [formGroup]="metadataForm" (ngSubmit)="requstMetadataSubmit()">
+  <select formControlName="metadataName">
+    <option *ngFor="let metadata of requestMetadata"
+            [value]="metadata">
+      {{RequestMetadataMapping[metadata]}}
+    </option>
+  </select>
+  <input type="text" formControlName="metadataValue" class="form-control">
+  <button type="submit" class="btn btn-success">Submit</button>
+</form>
+<br>
 
 <form [formGroup]="productForm" (ngSubmit)="requestSubmit()">
   <table class="table table-bordered" formArrayName="tokens">
