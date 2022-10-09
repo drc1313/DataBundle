@@ -25,4 +25,11 @@ namespace DataBundle.BL
         [Required]
         public string Value { get; set; }
     }
+
+    public class APIRequestMetadataDTO 
+    {
+        [Required]
+        public string Value { get; set; }
+    }
+
 }

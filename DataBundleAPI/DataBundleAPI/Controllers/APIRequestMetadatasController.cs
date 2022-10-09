@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DataBundle.BL;
 using DataBundle.DAL;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace DataBundleAPI.Controllers
 {
@@ -44,15 +45,21 @@ namespace DataBundleAPI.Controllers
 
         // PUT: api/APIRequestMetadatas/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAPIRequestMetadata(int id, APIRequestMetadata aPIRequestMetadata)
+        [HttpPut("{RequestId}/{Key}")]
+        public async Task<IActionResult> PutAPIRequestMetadata(Guid RequestId, string Key, APIRequestMetadataDTO body)
         {
-            if (id != aPIRequestMetadata.Id)
+
+            var requestMetadataObject = await _context.APIRequestMetadata.Where(x => x.RequestId == RequestId & x.Key == Key).FirstOrDefaultAsync();
+
+            if (requestMetadataObject != null)
+            {
+                requestMetadataObject.Value = body.Value;
+                _context.Entry(requestMetadataObject).State = EntityState.Modified;
+            }
+            else 
             {
                 return BadRequest();
             }
-
-            _context.Entry(aPIRequestMetadata).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +67,7 @@ namespace DataBundleAPI.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!APIRequestMetadataExists(id))
+                if (!APIRequestMetadataExists(RequestId))
                 {
                     return NotFound();
                 }
@@ -85,24 +92,29 @@ namespace DataBundleAPI.Controllers
         }
 
         // DELETE: api/APIRequestMetadatas/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAPIRequestMetadata(int id)
+        [HttpDelete("{RequestId}/{Key}")]
+        public async Task<IActionResult> DeleteAPIRequestMetadata(Guid RequestId, string Key)
         {
-            var aPIRequestMetadata = await _context.APIRequestMetadata.FindAsync(id);
-            if (aPIRequestMetadata == null)
+            var requestMetadataObject = await _context.APIRequestMetadata.Where(x => x.RequestId == RequestId & x.Key == Key).FirstOrDefaultAsync();
+
+            if (requestMetadataObject != null)
             {
-                return NotFound();
+                _context.Entry(requestMetadataObject).State = EntityState.Modified;
+            }
+            else
+            {
+                return BadRequest();
             }
 
-            _context.APIRequestMetadata.Remove(aPIRequestMetadata);
+            _context.APIRequestMetadata.Remove(requestMetadataObject);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool APIRequestMetadataExists(int id)
+        private bool APIRequestMetadataExists(Guid requestId)
         {
-            return _context.APIRequestMetadata.Any(e => e.Id == id);
+            return _context.APIRequestMetadata.Any(e => e.RequestId == requestId);
         }
     }
 }
