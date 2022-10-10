@@ -107,7 +107,8 @@ export class RequestComponent extends RequestExtend{
       }
   }
 
- //POSTs user defined request metadata
+  //TODO: AFTER SETTING EXPECTED RESPONSE, THE REQUEST WILL NOT TRACK USAGE UNTIL PAGE GETS REFRESHED
+  //POSTs user defined request metadata
   async requstMetadataSubmit()
   {
     var requestURL = '/api/APIRequestMetadatas';
@@ -117,14 +118,17 @@ export class RequestComponent extends RequestExtend{
   }
 
   async requestSubmit(){
-    var requestSuccess = false;
+    
     var submitURL = this.requestInstance.requestURL;
     var submitBody = this.requestMetaData.get(RequestMetadataValues.REQUEST_BODY)
    
     for(var token of this.productForm.value.tokens)
     {
       submitURL = submitURL.replace("{"+token.tokenName+"}",token.token)
-      submitBody = submitBody.replace("{"+token.tokenName+"}",token.token)
+      if(submitBody)
+      {
+        submitBody = submitBody.replace("{"+token.tokenName+"}",token.token)
+      }
     }
 
     var usage: APIUsage;
@@ -161,7 +165,7 @@ export class RequestComponent extends RequestExtend{
           
           //If we do not find the expected property then the request failed.        
           if(res.body[this.requestMetaData.get(RequestMetadataValues.REQUEST_EXPECTED_RESPONSE)]){
-            requestSuccess = true;
+            
             this.usageInstance.incrementAccountUsage(usage);
           }
           else
@@ -170,7 +174,7 @@ export class RequestComponent extends RequestExtend{
             for(var elm of res.body)
             {
               if(elm[this.requestMetaData.get(RequestMetadataValues.REQUEST_EXPECTED_RESPONSE)]){
-                requestSuccess = true;
+                
                 this.usageInstance.incrementAccountUsage(usage);
                 break;
               }
@@ -178,16 +182,15 @@ export class RequestComponent extends RequestExtend{
           } 
         })
       }
-      else if(this.requestMetaData.get(RequestMetadataValues.REQUEST_TYPE) == "POST"){
-        
-        headers = headers.append("Content-Type",this.requestMetaData.get(RequestMetadataValues.REQUEST_FORMAT))
-     
+      //TODO: WILL NOT SEARCH WITHIN RESPONSE (IF LISTED) FOR REQUEST_EXPECTED_RESPONSE LIKE THE GET ROUTE DOES
+      else if(this.requestMetaData.get(RequestMetadataValues.REQUEST_TYPE) == "POST")
+      {        
+        headers = headers.append("Content-Type",this.requestMetaData.get(RequestMetadataValues.REQUEST_FORMAT))     
         //Send the request
         this.http.post<any>(submitURL,submitBody,{headers:headers, observe: 'response'}).subscribe((res)=>{
-          //If we do not find the expected property then the request failed.        
-          if(res.body[this.requestMetaData.get(RequestMetadataValues.REQUEST_EXPECTED_RESPONSE)]){
-            requestSuccess = true;
-            this.usageInstance.incrementAccountUsage(usage);
+          //If we do not find the expected property then the request failed.          
+          if(res.body[this.requestMetaData.get(RequestMetadataValues.REQUEST_EXPECTED_RESPONSE)]){            
+            this.usageInstance.incrementAccountUsage(usage);            
           }
         })
       }
@@ -195,12 +198,7 @@ export class RequestComponent extends RequestExtend{
       {
         console.log("You have exceened your quota for " + this.currentAccount.accountName)
       }
-    }
-    
-    
-    if(!requestSuccess){
-      console.log("The Request has failed")
-    }
+    }    
   }
   
   //Functions for request creation/editing 
