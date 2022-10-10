@@ -4,7 +4,6 @@ import { RequestExtend } from '../request-class/request.extend';
 import { FormGroup, FormArray, FormBuilder} from '@angular/forms'
 import {Usage, APIUsage} from '../usage/usage-class'
 import {APIAccounts} from '../accounts/accounts.component'
-import { map } from 'rxjs/operators';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -20,6 +19,7 @@ export class RequestComponent extends RequestExtend{
   metadataForm: FormGroup;
   inputInstance:APIRequest;
   requestInstance:APIRequest;
+  requestMetaData = new Map();
   currentAccount:APIAccounts;
   usageInstance = Usage.getInstance();
   public RequestMetadataMapping = RequestMetadataMapping
@@ -58,7 +58,7 @@ export class RequestComponent extends RequestExtend{
   }
 
   async testRequest(request:APIRequest){
-    this.requestInstance = request;
+    await this.setRequestInstance(request)
     this.currentAccount = await this.get(request.accountName, "/api/APIAccounts/")
     this.createInputsFromTokens()
   }
@@ -85,35 +85,26 @@ export class RequestComponent extends RequestExtend{
         }        
       }
 
-      // if(this.requestInstance.requestBody.length > 0){
-      //   var split = this.requestInstance.requestBody.split("{")
-      //   for (var elm of split)
-      //   {
-      //     var tokenName = elm.substring(0,elm.indexOf("}"))
-      //     if (tokenName.length>0)
-      //     {
-      //       var tokenValue = ""
-      //       if(tokenName.includes("APIKEY"))
-      //       {
-      //         tokenValue = this.currentAccount.apiKey
-      //       }
-      //       else if(tokenName.includes("DATE"))
-      //       {
-      //         tokenValue = this.currentAccount.dateFormat
-      //       }
-      //       this.tokens().push(this.newToken(tokenName, tokenValue));
-      //     }        
-      //   }
-      // }
-  }
-
-
-  async getRequestMetadata(metadataDict:any): Promise<any> {
-    var res = await firstValueFrom(this.http.get<any>("/api/APIRequestMetadatas/"+this.requestInstance.requestId))
-    for(var elm of res)
-    {
-      metadataDict.set(elm.key, elm.value)
-    }
+      if(Array.from(this.requestMetaData.keys()).includes(RequestMetadataMapping.REQUEST_BODY)){
+        var split = String(this.requestMetaData.get(RequestMetadataMapping.REQUEST_BODY)).split("{")
+        for (var elm of split)
+        {
+          var tokenName = elm.substring(0,elm.indexOf("}"))
+          if (tokenName.length>0)
+          {
+            var tokenValue = ""
+            if(tokenName.includes("APIKEY"))
+            {
+              tokenValue = this.currentAccount.apiKey
+            }
+            else if(tokenName.includes("DATE"))
+            {
+              tokenValue = this.currentAccount.dateFormat
+            }
+            this.tokens().push(this.newToken(tokenName, tokenValue));
+          }        
+        }
+      }
   }
 
  //POSTs user defined request metadata
@@ -128,17 +119,14 @@ export class RequestComponent extends RequestExtend{
   async requestSubmit(){
     var requestSuccess = false;
     var submitURL = this.requestInstance.requestURL;
-    // var submitBody = this.requestInstance.requestBody;
+    var submitBody = this.requestMetaData.get(RequestMetadataValues.REQUEST_BODY)
+   
     for(var token of this.productForm.value.tokens)
     {
       submitURL = submitURL.replace("{"+token.tokenName+"}",token.token)
-      // submitBody = submitBody.replace("{"+token.tokenName+"}",token.token)
+      submitBody = submitBody.replace("{"+token.tokenName+"}",token.token)
     }
 
-    var metadataDict = new Map();
-    
-    await this.getRequestMetadata(metadataDict)
- 
     var usage: APIUsage;
     usage = await this.usageInstance.getAccountUsage(this.currentAccount.accountName) as APIUsage
 
@@ -148,11 +136,11 @@ export class RequestComponent extends RequestExtend{
       //Check for any headers configured with the account and apply them to the request
       var headers= new HttpHeaders() 
      
-      if(Array.from(metadataDict.keys()).includes(RequestMetadataMapping.REQUEST_HEADER))
+      if(Array.from(this.requestMetaData.keys()).includes(RequestMetadataMapping.REQUEST_HEADER))
       {
-        var headerStr =  metadataDict.get(RequestMetadataValues.REQUEST_HEADER)
+        var headerStr = this.requestMetaData.get(RequestMetadataValues.REQUEST_HEADER)
         
-        if(headerStr.length > 0){
+        if(headerStr && headerStr.length > 0){
 
           headerStr = headerStr.replace("{APIKEY}", this.currentAccount.apiKey)
 
@@ -166,41 +154,53 @@ export class RequestComponent extends RequestExtend{
           }
         }
       }
-      console.log(headers)
-      if(metadataDict.get(RequestMetadataValues.REQUEST_TYPE) == "GET")
+      if(this.requestMetaData.get(RequestMetadataValues.REQUEST_TYPE) == "GET")
       {
         //Send the request
         this.http.get<any>(submitURL,{headers:headers, observe: 'response'}).subscribe((res)=>{
+          
           //If we do not find the expected property then the request failed.        
-          if(res.body[metadataDict.get(RequestMetadataValues.REQUEST_EXPECTED_RESPONSE)]){
+          if(res.body[this.requestMetaData.get(RequestMetadataValues.REQUEST_EXPECTED_RESPONSE)]){
+            requestSuccess = true;
+            this.usageInstance.incrementAccountUsage(usage);
+          }
+          else
+          {
+            //If it was not found in the body attempt to iterate though elements of the body
+            for(var elm of res.body)
+            {
+              if(elm[this.requestMetaData.get(RequestMetadataValues.REQUEST_EXPECTED_RESPONSE)]){
+                requestSuccess = true;
+                this.usageInstance.incrementAccountUsage(usage);
+                break;
+              }
+            }
+          } 
+        })
+      }
+      else if(this.requestMetaData.get(RequestMetadataValues.REQUEST_TYPE) == "POST"){
+        
+        headers = headers.append("Content-Type",this.requestMetaData.get(RequestMetadataValues.REQUEST_FORMAT))
+     
+        //Send the request
+        this.http.post<any>(submitURL,submitBody,{headers:headers, observe: 'response'}).subscribe((res)=>{
+          //If we do not find the expected property then the request failed.        
+          if(res.body[this.requestMetaData.get(RequestMetadataValues.REQUEST_EXPECTED_RESPONSE)]){
             requestSuccess = true;
             this.usageInstance.incrementAccountUsage(usage);
           }
         })
       }
-      // else if(this.requestInstance.requestType == RequestType.POST){
-        
-        
-        // var symb = new test();
-        // //Send the request
-        // this.http.post<any>(submitURL,symb,{headers:headers, observe: 'response'}).subscribe((res)=>{
-        //   //If we do not find the expected property then the request failed.        
-        //   if(res.body[this.requestInstance.expectedProperty]){
-        //     requestSuccess = true;
-        //     this.usageInstance.incrementAccountUsage(usage);
-        //   }
-        // })
-      // }
-      // else
-      // {
-      //   console.log("You have exceened your quota for " + this.currentAccount.accountName)
-      // }
+      else
+      {
+        console.log("You have exceened your quota for " + this.currentAccount.accountName)
+      }
     }
     
     
-    // if(!requestSuccess){
-    //   console.log("The Request has failed")
-    // }
+    if(!requestSuccess){
+      console.log("The Request has failed")
+    }
   }
   
   //Functions for request creation/editing 
@@ -217,9 +217,21 @@ export class RequestComponent extends RequestExtend{
     this.getAll();
     this.clearInput();
   }
- 
+
+  async setRequestInstance(selectedRequest:APIRequest)
+  {
+    this.requestMetaData.clear()
+    
+    this.requestInstance = selectedRequest;
+    var res = await firstValueFrom(this.http.get<any>("/api/APIRequestMetadatas/"+this.requestInstance.requestId))
+    for(var elm of res)
+    {
+      this.requestMetaData.set(elm.key, elm.value)
+    }
+  }
+
   async requestPopulateInput(singleRequest: APIRequest){
-      this.requestInstance = singleRequest;
+      await this.setRequestInstance(singleRequest)
       this.inputInstance.accountName = this.requestInstance.accountName;
       this.inputInstance.requestName = this.requestInstance.requestName;
       this.inputInstance.requestURL = this.requestInstance.requestURL;
@@ -243,10 +255,6 @@ class APIRequest {
   requestName: string="";
   requestURL: string="";
 }
-// class test
-// {
-//   symbol="MSFT"
-// }
 
 class MetaDataRequestBody
 {

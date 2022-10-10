@@ -45,7 +45,7 @@ export class Usage {
     this.getAllUsages();
   }
   async createUsageForAccount(accountName:string){
-    var usage:APIUsage = {usageID:"00000000-0000-0000-0000-000000000000", accountName, currentUsage:0, maxUsage:0, usageDuration:0, lastCallDate:new Date().toISOString().slice(0, 19)}
+    var usage:APIUsage = {usageID:"00000000-0000-0000-0000-000000000000", accountName, currentUsage:0, maxUsage:100, usageDuration:0, lastCallDate:new Date().toISOString().slice(0, 19)}
     await firstValueFrom(this.http.post<APIUsage>("/api/APIUsages/", usage))
     this.getAllUsages();
   }
