@@ -47,15 +47,15 @@
 </form>
 <br>
 
-<form [formGroup]="productForm" (ngSubmit)="requestSubmit()">
+<form [formGroup]="this.requestTokens.getTokensForm()" (ngSubmit)="requestSubmit()">
   <table class="table table-bordered" formArrayName="tokens">
     <tr>
       <th colspan="2">Test Request:</th>
     </tr>
-    <tr *ngFor="let quantity of tokens().controls; let i=index" [formGroupName]="i">
+    <tr *ngFor="let quantity of requestTokens.getTokensAsFromArray().controls; let i=index" [formGroupName]="i">
       <td>
         <!-- This line gets the token name from the object ex. SYMBOL DATE APIKEY (Could be imporoved) -->
-        {{(this.tokens().at(i).value.tokenName)}}
+        {{(this.requestTokens.getTokensAsFromArray().at(i).value.tokenName)}}
           <input type="text" formControlName="token" class="form-control">
       </td>
     </tr>

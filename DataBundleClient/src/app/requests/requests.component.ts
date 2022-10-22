@@ -1,10 +1,12 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component } from '@angular/core';
-import { RequestExtend } from '../request-class/request.extend';
-import { FormGroup, FormArray, FormBuilder} from '@angular/forms'
+import {HttpClient, HttpHeaders} from '@angular/common/http'
+import {Component} from '@angular/core'
+import {RequestExtend} from '../request-class/request.extend'
+import {FormGroup, FormBuilder} from '@angular/forms'
 import {Usage, APIUsage} from '../usage/usage-class'
 import {APIAccounts} from '../accounts/accounts.component'
-import { firstValueFrom } from 'rxjs';
+import {RequestMetadataValues,RequestMetadataMapping, MetaDataRequestBody, RequestType} from './requests_metadata'
+import {firstValueFrom} from 'rxjs'
+import {RequestTokens} from './requests_tokens'
 
 @Component({
   selector: 'app-root',
@@ -15,13 +17,14 @@ import { firstValueFrom } from 'rxjs';
 export class RequestComponent extends RequestExtend{
  
   title = 'DataBundleClient';
-  productForm: FormGroup;
   metadataForm: FormGroup;
   inputInstance:APIRequest;
   requestInstance:APIRequest;
   requestMetaData = new Map();
   currentAccount:APIAccounts;
   usageInstance = Usage.getInstance();
+  requestTokens:RequestTokens;
+
   public RequestMetadataMapping = RequestMetadataMapping
   public requestMetadataValues = Object.values(RequestMetadataValues)
   
@@ -30,81 +33,18 @@ export class RequestComponent extends RequestExtend{
     this.inputInstance = new APIRequest();
     this.requestInstance = new APIRequest();
     this.currentAccount = new APIAccounts();
-
-    this.productForm = this.fb.group({
-      tokens: this.fb.array([]) ,
-    });
+    this.requestTokens = new RequestTokens(fb);
     
     this.metadataForm = this.fb.group({
        metadataName: [''],
        metadataValue: ['']
     });
   }
-
-//Dynamic token Element input creation based of Request URL
-  tokens() : FormArray{
-    return this.productForm.get("tokens") as FormArray
-  }
-
-  newToken(tokenName:string, tokenValue:string): FormGroup{
-    return this.fb.group({
-      tokenName: tokenName,
-      token: tokenValue
-    })
-  }
-
-  clearTokens(){
-    this.tokens().clear();
-  }
-
+  
   async testRequest(request:APIRequest){
     await this.setRequestInstance(request)
     this.currentAccount = await this.get(request.accountName, "/api/APIAccounts/")
-    this.createInputsFromTokens()
-  }
-
-  createInputsFromTokens(){
-    this.clearTokens();
-
-      var split = this.requestInstance.requestURL.split("{")
-      for (var elm of split)
-      {
-        var tokenName = elm.substring(0,elm.indexOf("}"))
-        if (tokenName.length>0)
-        {
-          var tokenValue = ""
-          if(tokenName.includes("APIKEY"))
-          {
-            tokenValue = this.currentAccount.apiKey
-          }
-          else if(tokenName.includes("DATE"))
-          {
-            tokenValue = this.currentAccount.dateFormat
-          }
-          this.tokens().push(this.newToken(tokenName, tokenValue));
-        }        
-      }
-
-      if(Array.from(this.requestMetaData.keys()).includes(RequestMetadataMapping.REQUEST_BODY)){
-        var split = String(this.requestMetaData.get(RequestMetadataMapping.REQUEST_BODY)).split("{")
-        for (var elm of split)
-        {
-          var tokenName = elm.substring(0,elm.indexOf("}"))
-          if (tokenName.length>0)
-          {
-            var tokenValue = ""
-            if(tokenName.includes("APIKEY"))
-            {
-              tokenValue = this.currentAccount.apiKey
-            }
-            else if(tokenName.includes("DATE"))
-            {
-              tokenValue = this.currentAccount.dateFormat
-            }
-            this.tokens().push(this.newToken(tokenName, tokenValue));
-          }        
-        }
-      }
+    this.requestTokens.createInputsFromTokens(this.requestInstance,this.currentAccount,this.requestMetaData)
   }
 
   //TODO: AFTER SETTING EXPECTED RESPONSE, THE REQUEST WILL NOT TRACK USAGE UNTIL PAGE GETS REFRESHED
@@ -121,13 +61,32 @@ export class RequestComponent extends RequestExtend{
     
     var submitURL = this.requestInstance.requestURL;
     var submitBody = this.requestMetaData.get(RequestMetadataValues.REQUEST_BODY)
-   
-    for(var token of this.productForm.value.tokens)
+    var submitHeader = this.requestMetaData.get(RequestMetadataValues.REQUEST_HEADER)
+    var headers= new HttpHeaders() 
+
+    //Parse the request URL/Header/Body for any tokens that need to be applied. 
+    for(var token of this.requestTokens.getTokensForm().value.tokens)
     {
       submitURL = submitURL.replace("{"+token.tokenName+"}",token.token)
       if(submitBody)
       {
         submitBody = submitBody.replace("{"+token.tokenName+"}",token.token)
+      }
+      if(submitHeader)
+      {
+        submitHeader = submitHeader.replace("{"+token.tokenName+"}",token.token)
+      }
+    }
+
+    //Construct the request header if one exists
+    if(submitHeader)
+    {
+      var headersList = submitHeader.split(",")
+    
+      for(var header of headersList)
+      {
+        var splitHeader = header.split(":")        
+        headers = headers.append(splitHeader[0].trim(), splitHeader[1].trim())
       }
     }
 
@@ -137,28 +96,8 @@ export class RequestComponent extends RequestExtend{
     //Verify the usage is not maxed out
     if(usage.currentUsage < usage.maxUsage)
     {      
-      //Check for any headers configured with the account and apply them to the request
-      var headers= new HttpHeaders() 
-     
-      if(Array.from(this.requestMetaData.keys()).includes(RequestMetadataMapping.REQUEST_HEADER))
-      {
-        var headerStr = this.requestMetaData.get(RequestMetadataValues.REQUEST_HEADER)
-        
-        if(headerStr && headerStr.length > 0){
-
-          headerStr = headerStr.replace("{APIKEY}", this.currentAccount.apiKey)
-
-          var headersList = headerStr.split(",")
-
-          for(var header of headersList)
-          {
-            var splitHeader = header.split(":")
-            console.log(splitHeader)
-            headers = headers.append(splitHeader[0].trim(), splitHeader[1].trim())
-          }
-        }
-      }
-      if(this.requestMetaData.get(RequestMetadataValues.REQUEST_TYPE) == "GET")
+      
+      if(this.requestMetaData.get(RequestMetadataValues.REQUEST_TYPE) == RequestType.GET)
       {
         //Send the request
         this.http.get<any>(submitURL,{headers:headers, observe: 'response'}).subscribe((res)=>{
@@ -183,7 +122,7 @@ export class RequestComponent extends RequestExtend{
         })
       }
       //TODO: WILL NOT SEARCH WITHIN RESPONSE (IF LISTED) FOR REQUEST_EXPECTED_RESPONSE LIKE THE GET ROUTE DOES
-      else if(this.requestMetaData.get(RequestMetadataValues.REQUEST_TYPE) == "POST")
+      else if(this.requestMetaData.get(RequestMetadataValues.REQUEST_TYPE) == RequestType.POST)
       {        
         headers = headers.append("Content-Type",this.requestMetaData.get(RequestMetadataValues.REQUEST_FORMAT))     
         //Send the request
@@ -243,50 +182,14 @@ export class RequestComponent extends RequestExtend{
     this.inputInstance.requestName = "";
     this.inputInstance.requestURL = "";
   }
-
   
 }
 
-class APIRequest {
+export class APIRequest {
   requestId: string ="00000000-0000-0000-0000-000000000000";
   accountName: string="";
   requestName: string="";
   requestURL: string="";
 }
 
-class MetaDataRequestBody
-{
-  requestid:string="";
-  key:string="";
-  value:string="";
-  constructor(id:string, key:string, value:string) {
-    this.requestid = id;
-    this.key = key;
-    this.value = value;
-  }
-}
 
-// The internet says this is what I am supposed to do for selection options...
-export enum RequestMetadataValues
-{
-  REQUEST_HEADER = "REQUEST_HEADER",
-  REQUEST_BODY = "REQUEST_BODY",
-  REQUEST_FORMAT= "REQUEST_FORMAT",
-  REQUEST_TYPE= "REQUEST_TYPE",
-  REQUEST_EXPECTED_RESPONSE= "REQUEST_EXPECTED_RESPONSE"
-}
-export const RequestMetadataMapping: Record<RequestMetadataValues, string> = {
-  [RequestMetadataValues.REQUEST_HEADER]: RequestMetadataValues.REQUEST_HEADER,
-  [RequestMetadataValues.REQUEST_BODY]: RequestMetadataValues.REQUEST_BODY,
-  [RequestMetadataValues.REQUEST_FORMAT]: RequestMetadataValues.REQUEST_FORMAT,
-  [RequestMetadataValues.REQUEST_TYPE]: RequestMetadataValues.REQUEST_TYPE,
-  [RequestMetadataValues.REQUEST_EXPECTED_RESPONSE]: RequestMetadataValues.REQUEST_EXPECTED_RESPONSE
-};
-
-// enum RequestType
-// {
-//   GET,
-//   POST,
-//   PUT,
-//   DELETE    
-// }
