@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DataBundle.BL;
 using DataBundle.DAL;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace DataBundleAPI.Controllers
 {
@@ -33,7 +34,7 @@ namespace DataBundleAPI.Controllers
         }
 
         // GET: api/APIUsages/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:Guid}")]
         public async Task<ActionResult<APIUsage>> GetAPIUsage(Guid id)
         {
           if (_context.APIUsage == null)
@@ -48,6 +49,26 @@ namespace DataBundleAPI.Controllers
             }
 
             return aPIUsage;
+        }
+
+        // GET: api/APIUsages/
+        [HttpGet("{accountName}")]
+        public async Task<ActionResult<APIUsage>> GetAPIUsage(String accountName)
+        {
+            if (_context.APIUsage == null)
+            {
+                return NotFound();
+            }
+            if (accountName == "")
+            { }
+            var accountUsage = await _context.APIUsage.Where(x => x.AccountName == accountName).FirstOrDefaultAsync();
+
+            if (accountUsage == null)
+            {
+                return NotFound();
+            }
+
+            return accountUsage;
         }
 
         // PUT: api/APIUsages/5

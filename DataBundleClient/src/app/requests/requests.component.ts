@@ -1,8 +1,8 @@
-import {HttpClient, HttpHeaders} from '@angular/common/http'
+import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http'
 import {Component} from '@angular/core'
 import {RequestExtend} from '../request-class/request.extend'
 import {FormGroup, FormBuilder} from '@angular/forms'
-import {Usage, APIUsage} from '../usage/usage-class'
+import {Usage} from '../usage/usage-class'
 import {APIAccounts} from '../accounts/accounts.component'
 import {RequestMetadataValues,RequestMetadataMapping, MetaDataRequestBody, RequestType} from './requests_metadata'
 import {firstValueFrom} from 'rxjs'
@@ -22,7 +22,6 @@ export class RequestComponent extends RequestExtend{
   requestInstance:APIRequest;
   requestMetaData = new Map();
   currentAccount:APIAccounts;
-  usageInstance = Usage.getInstance();
   requestTokens:RequestTokens;
 
   public RequestMetadataMapping = RequestMetadataMapping
@@ -47,7 +46,6 @@ export class RequestComponent extends RequestExtend{
     this.requestTokens.createInputsFromTokens(this.requestInstance,this.currentAccount,this.requestMetaData)
   }
 
-  //TODO: AFTER SETTING EXPECTED RESPONSE, THE REQUEST WILL NOT TRACK USAGE UNTIL PAGE GETS REFRESHED
   //POSTs user defined request metadata
   async requstMetadataSubmit()
   {
@@ -55,6 +53,27 @@ export class RequestComponent extends RequestExtend{
     var requestbody = new MetaDataRequestBody(this.requestInstance.requestId, this.metadataForm.value.metadataName,this.metadataForm.value.metadataValue)
     this.http.post<any>(requestURL,requestbody).subscribe((res)=>{
     })
+  }
+
+  private validateRequestResponse(res:HttpResponse<any>)
+  {
+    var wasExpected = false
+    //If we do not find the expected property then the request failed.        
+    if(res.body[this.requestMetaData.get(RequestMetadataValues.REQUEST_EXPECTED_RESPONSE)]){
+      wasExpected = true
+    }
+    else
+    {
+      //If it was not found in the body attempt to iterate though elements of the body
+      for(var elm of res.body)
+      {
+        if(elm[this.requestMetaData.get(RequestMetadataValues.REQUEST_EXPECTED_RESPONSE)]){
+          wasExpected = true
+          break;
+        }
+      }
+    } 
+    return wasExpected
   }
 
   async requestSubmit(){
@@ -90,46 +109,28 @@ export class RequestComponent extends RequestExtend{
       }
     }
 
-    var usage: APIUsage;
-    usage = await this.usageInstance.getAccountUsage(this.currentAccount.accountName) as APIUsage
-
     //Verify the usage is not maxed out
-    if(usage.currentUsage < usage.maxUsage)
-    {      
+    if(!await Usage.usageIsMaxed(this.currentAccount.accountName))
+    {
       
       if(this.requestMetaData.get(RequestMetadataValues.REQUEST_TYPE) == RequestType.GET)
       {
         //Send the request
         this.http.get<any>(submitURL,{headers:headers, observe: 'response'}).subscribe((res)=>{
-          
-          //If we do not find the expected property then the request failed.        
-          if(res.body[this.requestMetaData.get(RequestMetadataValues.REQUEST_EXPECTED_RESPONSE)]){
-            
-            this.usageInstance.incrementAccountUsage(usage);
-          }
-          else
+          if(this.validateRequestResponse(res))
           {
-            //If it was not found in the body attempt to iterate though elements of the body
-            for(var elm of res.body)
-            {
-              if(elm[this.requestMetaData.get(RequestMetadataValues.REQUEST_EXPECTED_RESPONSE)]){
-                
-                this.usageInstance.incrementAccountUsage(usage);
-                break;
-              }
-            }
-          } 
+            Usage.incrementAccountUsage(this.currentAccount.accountName, 1)
+          }
         })
       }
-      //TODO: WILL NOT SEARCH WITHIN RESPONSE (IF LISTED) FOR REQUEST_EXPECTED_RESPONSE LIKE THE GET ROUTE DOES
       else if(this.requestMetaData.get(RequestMetadataValues.REQUEST_TYPE) == RequestType.POST)
       {        
         headers = headers.append("Content-Type",this.requestMetaData.get(RequestMetadataValues.REQUEST_FORMAT))     
         //Send the request
         this.http.post<any>(submitURL,submitBody,{headers:headers, observe: 'response'}).subscribe((res)=>{
-          //If we do not find the expected property then the request failed.          
-          if(res.body[this.requestMetaData.get(RequestMetadataValues.REQUEST_EXPECTED_RESPONSE)]){            
-            this.usageInstance.incrementAccountUsage(usage);            
+          if(this.validateRequestResponse(res))
+          {
+            Usage.incrementAccountUsage(this.currentAccount.accountName, 1)
           }
         })
       }

@@ -1,56 +1,39 @@
 import { HttpClient, HttpXhrBackend } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { APIAccounts } from '../accounts/accounts.component';
 
 export class Usage {
 
-  private static usageInstance:Usage;
-  private allUsages: APIUsage[] = [];
+  static http = new HttpClient(
+    new HttpXhrBackend({ 
+      build: () => new XMLHttpRequest()
+    }));
+ 
 
-  private constructor(private http: HttpClient) {}
-
-  public static getInstance()
-  {
-    if(this.usageInstance==null){      
-      this.usageInstance = new Usage(
-        new HttpClient(
-          new HttpXhrBackend({ 
-            build: () => new XMLHttpRequest() 
-          })));
-    }
-    return Usage.usageInstance;
+  private static async getAccountUsage(accountName:string) {
+    return await firstValueFrom(Usage.http.get<APIUsage>("/api/APIUsages/"+accountName))
   }
 
-  async getAllUsages() {
-    this.allUsages = await firstValueFrom(this.http.get<APIUsage[]>("/api/APIUsages"))
+  //Return True if account usage is maxed out
+  public static async usageIsMaxed(accountName:string)
+  {
+    var accountUsage = await Usage.getAccountUsage(accountName)
+    Usage.usageDateCheck(accountUsage)
+    if(accountUsage.currentUsage >= accountUsage.maxUsage)
+    {
+      return true
+    }
+    return false
   }
   
-  async getAccountUsage(accountName:string)
-  {
-   await this.getAllUsages();
-
-    if(this.allUsages != null){
-      for(var usage of this.allUsages){
-        if(usage.accountName == accountName){
-          await this.usageDateCheck(usage)
-          return usage
-        }
-      }
-    }
-    return {};
+  static async updateUsageByObject(usage:APIUsage){
+    await firstValueFrom(Usage.http.put<APIUsage>("/api/APIUsages/"+usage.usageID, usage))
   }
-
-  async updateUsageByObject(usage:APIUsage){
-    await firstValueFrom(this.http.put<APIUsage>("/api/APIUsages/"+usage.usageID, usage))
-    this.getAllUsages();
-  }
-  async createUsageForAccount(accountName:string){
+  static async createUsageForAccount(accountName:string){
     var usage:APIUsage = {usageID:"00000000-0000-0000-0000-000000000000", accountName, currentUsage:0, maxUsage:100, usageDuration:0, lastCallDate:new Date().toISOString().slice(0, 19)}
-    await firstValueFrom(this.http.post<APIUsage>("/api/APIUsages/", usage))
-    this.getAllUsages();
+    await firstValueFrom(Usage.http.post<APIUsage>("/api/APIUsages/", usage))
   }
 
- async usageDateCheck(usage:APIUsage)
+  static async usageDateCheck(usage:APIUsage)
   {
     var currentDateTime= new Date(new Date().toISOString().slice(0, 19));
     var usageDate = new Date(usage.lastCallDate)
@@ -59,19 +42,20 @@ export class Usage {
     if(currentDateTime.getDay()!=usageDate.getDay() && usage.currentUsage != 0)
     {
       usage.currentUsage = 0
-      await this.updateUsageByObject(usage)
+      await Usage.updateUsageByObject(usage)
     }
     return usage
   }
 
-  async incrementAccountUsage(usage:APIUsage, amount:number=1){    
+  static async incrementAccountUsage(accountName:string, amount:number=1){
+    var usage = await this.getAccountUsage(accountName)
     usage.currentUsage += amount
     usage.lastCallDate = new Date().toISOString().slice(0, 19); 
-    await this.updateUsageByObject(usage)
+    await Usage.updateUsageByObject(usage)
   }
 }
 
-export interface APIUsage
+interface APIUsage
 {
   usageID: string,
   accountName: string,
