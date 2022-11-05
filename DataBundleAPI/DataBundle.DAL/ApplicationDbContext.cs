@@ -16,7 +16,15 @@ namespace DataBundle.DAL
         public virtual DbSet<APIRequest> APIRequest { get; set; } = null!;
         public virtual DbSet<APIRequestMetadata> APIRequestMetadata { get; set; } = null!;
         public virtual DbSet<APIUsage> APIUsage { get; set; } = null!;
-     
+        public virtual DbSet<APIBundle> APIBundle { get; set; } = null!;
+        public virtual DbSet<APIBundleRequests> APIBundleRequests { get; set; } = null!;
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<APIBundleRequests>().HasKey(table => new {
+                table.BundleId,
+                table.RequestId
+            });
+        }
     }
     public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
     {
@@ -28,6 +36,7 @@ namespace DataBundle.DAL
             builder.UseSqlServer(connectionString);
             return new ApplicationDbContext(builder.Options);
         }
-    }
 
+    }
+    
 }
