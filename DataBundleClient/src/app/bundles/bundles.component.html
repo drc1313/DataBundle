@@ -1,0 +1,29 @@
+<h1 id="tableLabel">All Bundles</h1>
+
+<p>List of all Bundles you have registered with</p>
+
+<p *ngIf="!responseElements"><em>Loading...</em></p>
+
+<table *ngIf="responseElements">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Bundle Name</th>
+      <th>Bundle Description</th>
+    </tr>
+  </thead>
+  
+  <tbody>
+    <tr *ngFor="let request of responseElements">
+
+    </tr>
+    
+    <td></td>    
+
+  </tbody>
+</table>
+<br>
+
+
+
+
