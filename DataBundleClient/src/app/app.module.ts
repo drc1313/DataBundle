@@ -8,6 +8,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AccountComponent } from './accounts/accounts.component';
 import { RequestComponent } from './requests/requests.component';
+import { BundlesComponent } from './bundles/bundles.component';
 
 import { AppComponent } from './app.component';
 
@@ -16,7 +17,8 @@ import { AppComponent } from './app.component';
     AppComponent,
     DashboardComponent,
     AccountComponent,
-    RequestComponent
+    RequestComponent,
+    BundlesComponent
   ],
   imports: [
     BrowserModule, HttpClientModule, AppRoutingModule, FormsModule, ReactiveFormsModule 

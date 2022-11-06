@@ -14,16 +14,61 @@
   </thead>
   
   <tbody>
-    <tr *ngFor="let request of responseElements">
+    <tr *ngFor="let bundle of responseElements">
+      <td></td>
+      <td>{{ bundle.bundleName }}</td>
+      <td>{{ bundle.bundleDescription }}</td>  
+      
+      <td><button (click)="getBundleRequests(bundle)">Modify Requests</button></td>
+      <td><button (click)="bundlePopulateInput(bundle)">Edit</button></td>
+      <td><button (click)="delete(bundle.bundleId)">Delete</button></td>
 
     </tr>
     
     <td></td>    
-
+    <td><input type="text" id="bundleName" [(ngModel)]="this.inputBundleInstance.bundleName" ></td>
+    <td><input type="text" id="bundleDescription" [(ngModel)]="this.inputBundleInstance.bundleDescription" ></td>
+    <th><button (click)="submit(this.inputBundleInstance)">Submit</button></th>
   </tbody>
 </table>
 <br>
 
+<table *ngIf="bundleRequests">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Request Id</th>
+      <th>Request Properties</th>
+      <th>Request Priority</th>
+
+    </tr>
+  </thead>
+  
+  <tbody>
+    <tr *ngFor="let bundleRequest of bundleRequests">
+      <td></td>
+      <td>{{ bundleRequest.requestId }}</td>
+      <td>{{ bundleRequest.requestProperties }}</td>  
+      <td>{{ bundleRequest.requestPriority }}</td>  
+
+      
+      <td><button (click)="bundleRequstPopulateInput(bundleRequest)">Add Request</button></td>
+      <td><button (click)="bundleRequstPopulateInput(bundleRequest)">Edit</button></td>
+      <td><button (click)="delete(bundleRequest.bundleId)">Delete</button></td>
+
+    </tr>
+    
+    <td></td>    
+    <td><input type="text" id="requestId" [(ngModel)]="this.inputBundleRequestInstance.requestId" ></td>
+    <td><input type="text" id="requestProperties" [(ngModel)]="this.inputBundleRequestInstance.requestProperties" ></td>    
+    <td><input type="text" id="requestPriority" [(ngModel)]="this.inputBundleRequestInstance.requestPriority" ></td>
+    <th><button (click)='submit(this.inputBundleRequestInstance,"/api/APIBundleRequests/")'>Submit</button></th>
+  </tbody>
+</table>
+
+<table *ngIf="currentBundleInstance">
+
+</table>
 
 
 
