@@ -7,8 +7,6 @@ namespace DataBundle.BL
 {
     public class APIBundleRequests
     {
-
-
         [Required]
         [Key, Column(Order = 0)]
         [DefaultValue("00000000-0000-0000-0000-000000000000")]

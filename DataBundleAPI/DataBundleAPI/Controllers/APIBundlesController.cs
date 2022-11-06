@@ -7,8 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DataBundle.BL;
 using DataBundle.DAL;
+using AutoMapper.Internal;
 
-namespace DataBundleAPI
+namespace DataBundleAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -47,6 +48,8 @@ namespace DataBundleAPI
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAPIBundle(Guid id, APIBundle aPIBundle)
         {
+            aPIBundle.BundleId = id;
+
             if (id != aPIBundle.BundleId)
             {
                 return BadRequest();

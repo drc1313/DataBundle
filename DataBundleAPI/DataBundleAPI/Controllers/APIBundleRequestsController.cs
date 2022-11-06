@@ -9,7 +9,7 @@ using DataBundle.BL;
 using DataBundle.DAL;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace DataBundleAPI
+namespace DataBundleAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
