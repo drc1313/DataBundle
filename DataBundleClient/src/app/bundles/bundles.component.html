@@ -38,7 +38,6 @@
     <tr>
       <th></th>
       <th>Request Id</th>
-      <th>Request Properties</th>
       <th>Request Priority</th>
 
     </tr>
@@ -48,27 +47,60 @@
     <tr *ngFor="let bundleRequest of bundleRequests">
       <td></td>
       <td>{{ bundleRequest.requestId }}</td>
-      <td>{{ bundleRequest.requestProperties }}</td>  
       <td>{{ bundleRequest.requestPriority }}</td>  
 
       
-      <td><button (click)="bundleRequstPopulateInput(bundleRequest)">Add Request</button></td>
-      <td><button (click)="bundleRequstPopulateInput(bundleRequest)">Edit</button></td>
+      <td><button (click)="loadBundleRequestProperties(bundleRequest)">Configure Properties</button></td>
+
       <td><button (click)="delete(bundleRequest.bundleId)">Delete</button></td>
 
     </tr>
     
     <td></td>    
     <td><input type="text" id="requestId" [(ngModel)]="this.inputBundleRequestInstance.requestId" ></td>
-    <td><input type="text" id="requestProperties" [(ngModel)]="this.inputBundleRequestInstance.requestProperties" ></td>    
     <td><input type="text" id="requestPriority" [(ngModel)]="this.inputBundleRequestInstance.requestPriority" ></td>
     <th><button (click)='submit(this.inputBundleRequestInstance,"/api/APIBundleRequests/")'>Submit</button></th>
   </tbody>
 </table>
 
-<table *ngIf="currentBundleInstance">
+<br>
+
+<table *ngIf="properyWrapper.getParsedProperties()">
+
+  <thead>
+    <tr>
+      <th></th>
+      <th>Json Parse Values</th>
+    </tr>
+  </thead>
+
+  <tbody>    
+    
+    <tr *ngFor="let property of properyWrapper.getParsedProperties(); let i=index">
+      <td></td>
+      
+      <td><input style="width: 500px;" type="text" [(ngModel)]="properyWrapper.getParsedPropertiesClone()[i]"></td>
+      <button (click)='properyWrapper.deleteBundleProperty(i)'>Delete</button>
+    </tr>
+  </tbody>
+
+  <tfoot>
+
+    <tr>
+      <th></th>
+      <td>
+        
+        <button (click)='properyWrapper.addPropertyToBundle()'>Add Property</button>
+        <button (click)='applyPropertiesToBundleRequest()'>Submit</button>
+      </td>
+    </tr>
+    
+  </tfoot>
 
 </table>
+
+
+
 
 
 

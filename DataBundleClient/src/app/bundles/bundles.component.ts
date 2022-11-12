@@ -1,7 +1,8 @@
 import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http'
-import {Component} from '@angular/core'
+import {Component, Input} from '@angular/core'
 import {RequestExtend} from '../request-class/request.extend'
-import {FormGroup, FormBuilder} from '@angular/forms'
+import {BundlesPropertiesWrapper} from './bundles_properties_wrapper'
+import {FormGroup, FormBuilder, FormArray} from '@angular/forms'
 import {firstValueFrom} from 'rxjs'
 
 @Component({
@@ -19,19 +20,46 @@ export class BundlesComponent extends RequestExtend{
   currentBundleInstance?:APIBundle;
   inputBundleRequestInstance:APIBundleRequst= new APIBundleRequst();
 
-  
+
+  properyWrapper:BundlesPropertiesWrapper = new BundlesPropertiesWrapper();
+
+
+
+
   bundleRequests?: APIBundleRequst[];
 
   bundleRequestEditMode=false;
 
-  constructor(http: HttpClient) {
+  constructor(http: HttpClient, private fb:FormBuilder) {
     super(http, "/api/APIBundles/");
-
-
-  
   }
-  
-  
+
+
+
+  loadBundleRequestProperties(bundle:APIBundleRequst)
+  {
+    this.editMode = true;
+    this.editId = bundle.bundleId;
+    this.inputBundleRequestInstance.requestId = bundle.requestId;
+    this.inputBundleRequestInstance.requestProperties = bundle.requestProperties;
+    this.inputBundleRequestInstance.requestPriority = bundle.requestPriority;
+    this.properyWrapper.obtainPropertiesFromString(bundle.requestProperties);
+
+
+    
+  }
+
+  async applyPropertiesToBundleRequest(){
+    var tempList = []
+
+    for(var property of this.properyWrapper.obtainAlteredProperties())
+    {
+      tempList.push((JSON.parse(property)))
+    }
+    this.inputBundleRequestInstance.requestProperties = JSON.stringify(tempList);
+    await this.submit(this.inputBundleRequestInstance,"/api/APIBundleRequests/")
+  }
+
   //Functions for request creation/editing 
   async submit(body:any,path:string="/api/APIBundles/"){
     if(!this.editMode)
@@ -72,18 +100,16 @@ export class BundlesComponent extends RequestExtend{
 
     this.editMode = true;
     this.editId = bundle.bundleId;
-}
-async bundleRequstPopulateInput(bundleRequest: APIBundleRequst){
-  this.inputBundleRequestInstance.requestId = bundleRequest.requestId;
-  this.inputBundleRequestInstance.requestProperties = bundleRequest.requestProperties;
-  this.inputBundleRequestInstance.requestPriority = bundleRequest.requestPriority;
+  }   
 
+  async bundleRequstPopulateInput(bundleRequest: APIBundleRequst){
+    this.inputBundleRequestInstance.requestId = bundleRequest.requestId;
+    this.inputBundleRequestInstance.requestProperties = bundleRequest.requestProperties;
+    this.inputBundleRequestInstance.requestPriority = bundleRequest.requestPriority;
 
-  this.editMode = true;
-  this.editId = bundleRequest.bundleId;
-}
-
-
+    this.editMode = true;
+    this.editId = bundleRequest.bundleId;
+  }
 
 }
 

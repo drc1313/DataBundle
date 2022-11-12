@@ -39,7 +39,6 @@ export class RequestComponent extends RequestExtend{
        metadataValue: ['']
     });
   }
-  
   async testRequest(request:APIRequest){
     await this.setRequestInstance(request)
     this.currentAccount = await this.get(request.accountName, "/api/APIAccounts/")
