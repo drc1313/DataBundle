@@ -52,7 +52,7 @@
       
       <td><button (click)="loadBundleRequestProperties(bundleRequest)">Configure Properties</button></td>
 
-      <td><button (click)="delete(bundleRequest.bundleId)">Delete</button></td>
+      <td><button (click)='delete(bundleRequest.bundleId+"/"+bundleRequest.requestId,"api/APIBundleRequests/")'>Delete</button></td>
 
     </tr>
     

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using DataBundle.BL;
 using DataBundle.DAL;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Security.Cryptography;
 
 namespace DataBundleAPI.Controllers
 {
@@ -100,10 +101,11 @@ namespace DataBundleAPI.Controllers
         }
 
         // DELETE: api/APIBundleRequests/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAPIBundleRequests(Guid id)
+        [HttpDelete("{BundleId}/{RequestId}")]
+        public async Task<IActionResult> DeleteAPIBundleRequests(Guid BundleId, Guid RequestId)
         {
-            var aPIBundleRequests = await _context.APIBundleRequests.FindAsync(id);
+
+            var aPIBundleRequests = await _context.APIBundleRequests.Where(x => x.BundleId == BundleId & x.RequestId == RequestId).FirstOrDefaultAsync();
             if (aPIBundleRequests == null)
             {
                 return NotFound();
