@@ -1,0 +1,50 @@
+<h1 id="tableLabel">All Bundles</h1>
+
+<p>List of all Bundles you have registered with</p>
+
+<p *ngIf="!responseElements"><em>Loading...</em></p>
+
+<table *ngIf="responseElements">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Bundle Name</th>
+      <th>Bundle Description</th>
+    </tr>
+  </thead>
+  
+  <tbody>
+    <tr *ngFor="let bundle of responseElements">
+      <td></td>
+      <td>{{ bundle.bundleName }}</td>
+      <td>{{ bundle.bundleDescription }}</td>  
+      <td><button (click)="submitBundleRequest(bundle)">Submit Request</button></td>
+    </tr>
+    
+    <td></td>    
+
+  </tbody>
+</table>
+<br>
+
+<form [formGroup]="this.requestTokens.getTokensForm()" (ngSubmit)="requestSubmit()">
+  <table class="table table-bordered" formArrayName="tokens">
+    <tr>
+      <th colspan="2">Test Request:</th>
+    </tr>
+    <tr *ngFor="let quantity of requestTokens.getTokensAsFromArray().controls; let i=index" [formGroupName]="i">
+      <td *ngIf='this.requestTokens.getTokensAsFromArray().at(i).value.tokenName!="APIKEY"'>
+        <!-- This line gets the token name from the object ex. SYMBOL DATE APIKEY (Could be imporoved) -->
+        {{(this.requestTokens.getTokensAsFromArray().at(i).value.tokenName)}}
+          <input type="text" formControlName="token" class="form-control">
+      </td>
+    </tr>
+  </table>
+  <button type="submit" class="btn btn-success">Submit</button>
+</form>
+
+
+
+
+
+

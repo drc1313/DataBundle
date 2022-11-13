@@ -35,6 +35,20 @@ export class RequestTokens{
         }
     }
 
+    public createInputsFromManyTokens(requestInstance:APIRequest, currentAccount:APIAccounts, requestMetaData:Map<string,string>){
+       // this.clearTokens();
+
+        this.parseStringForManyTokens(requestInstance.requestURL, currentAccount)
+
+        if(Array.from(requestMetaData.keys()).includes(RequestMetadataMapping.REQUEST_HEADER)){
+            this.parseStringForManyTokens(String(requestMetaData.get(RequestMetadataMapping.REQUEST_HEADER)), currentAccount)            
+        }
+
+        if(Array.from(requestMetaData.keys()).includes(RequestMetadataMapping.REQUEST_BODY)){
+            this.parseStringForManyTokens(String(requestMetaData.get(RequestMetadataMapping.REQUEST_BODY)), currentAccount)            
+        }
+    }
+
     private newToken(tokenName:string, tokenValue:string): FormGroup{
         return this.fb.group({
             tokenName: tokenName,
@@ -65,6 +79,38 @@ export class RequestTokens{
                         tokenValue = currentAccount.dateFormat
                     }
                     this.getTokensAsFromArray().push(this.newToken(tokenName, tokenValue));
+                }        
+            }
+    }
+
+    
+    //TODO: Add way to not use hardcoded token names. (APKEY,DATE,...)
+    private parseStringForManyTokens(tokenString:string, currentAccount:APIAccounts){
+        var split = tokenString.split("{")
+        console.log(split)
+            for (var elm of split)
+            {
+                var tokenName = elm.substring(0, elm.indexOf("}"))
+                if (tokenName.length>0)
+                {
+                    var tokenValue = ""
+                    
+                    if (tokenName.includes("DATE"))
+                    {
+                        tokenValue = currentAccount.dateFormat
+                    }
+
+                    var matchFound = false
+                    for(var curToken of this.getTokensAsFromArray().value){
+                        if(tokenName == curToken.tokenName){
+                            matchFound = true;
+                            break;
+                        }
+                    }
+                    if(!matchFound)
+                        this.getTokensAsFromArray().push(this.newToken(tokenName, tokenValue));
+                   
+
                 }        
             }
     }

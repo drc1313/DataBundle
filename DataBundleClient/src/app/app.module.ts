@@ -9,6 +9,8 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { AccountComponent } from './accounts/accounts.component';
 import { RequestComponent } from './requests/requests.component';
 import { BundlesComponent } from './bundles/bundles.component';
+import { BundleRequestComponent } from './bundle-request/bundle-request.component';
+
 
 import { AppComponent } from './app.component';
 
@@ -18,7 +20,8 @@ import { AppComponent } from './app.component';
     DashboardComponent,
     AccountComponent,
     RequestComponent,
-    BundlesComponent
+    BundlesComponent,
+    BundleRequestComponent
   ],
   imports: [
     BrowserModule, HttpClientModule, AppRoutingModule, FormsModule, ReactiveFormsModule 
